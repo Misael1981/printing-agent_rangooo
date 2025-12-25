@@ -1,0 +1,18 @@
+{
+  "name": "printing-agent_rangooo",
+  "version": "1.0.0",
+  "description": "Agente para impressão de pedidos",
+  "main": "main.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
+  },
+  "author": "Misael",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^39.2.7"
+  }
+}
