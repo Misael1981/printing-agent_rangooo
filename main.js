@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("node:path");
+const { iniciarAgente } = require("./src/server");
 
 let win;
 
@@ -22,19 +23,13 @@ function createWindow() {
   win.webContents.on("did-finish-load", () => {
     console.log("Página carregada, iniciando envios de status...");
   });
+
+  // Assim que a janela estiver pronta, liga o motor do agente!
+  win.webContents.on("did-finish-load", () => {
+    console.log("Página carregada! 🚀");
+    iniciarAgente(win); // Liga o motor do agente aqui dentro
+  });
 }
-
-app.whenReady().then(() => {
-  createWindow();
-
-  let statusTeste = "Online";
-  setInterval(() => {
-    if (win) {
-      statusTeste = statusTeste === "Online" ? "Offline" : "Online";
-      win.webContents.send("status-impressora", statusTeste);
-    }
-  }, 5000);
-});
 
 ipcMain.handle("ping", async () => {
   return "🏓 Pong! O processo Principal recebeu seu sinal.";
@@ -44,4 +39,8 @@ app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();
   }
+});
+
+app.whenReady().then(() => {
+  createWindow();
 });

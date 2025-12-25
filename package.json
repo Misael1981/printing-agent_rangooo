@@ -17,6 +17,9 @@
   },
   "dependencies": {
     "dotenv": "^17.2.3",
+    "node-thermal-printer": "^4.5.0",
+    "serialport": "^13.0.0",
+    "winston": "^3.19.0",
     "ws": "^8.18.3"
   }
 }
