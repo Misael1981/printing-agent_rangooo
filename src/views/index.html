@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      http-equiv="X-Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'"
+    />
+    <title>Agente de Impressão Rangooo</title>
+    <link rel="stylesheet" href="../public/css/styles.css" />
+  </head>
+  <body class="container">
+    <div>
+      <div class="badge-section">
+        <div class="badge-row">
+          <span class="badge badge-status badge-secondary">Desconectado</span>
+        </div>
+      </div>
+      <div class="header">
+        <h1>Agente de impressão Rangooo</h1>
+        <p>
+          Versão do Electron: <span id="versao-electron">Carregando...</span>
+        </p>
+      </div>
+      <div class="badge-section">
+        <div class="badge-center">
+          <p>
+            Status impressora:
+            <span id="status-badge" class="badge badge-status badge-secondary">
+              Desconectado
+            </span>
+          </p>
+        </div>
+      </div>
+    </div>
+    <script src="./renderer.js"></script>
+  </body>
+</html>

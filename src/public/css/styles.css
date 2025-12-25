@@ -1,0 +1,21 @@
+@import "./components/badge.css";
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+}
+
+.container {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Ubuntu, Cantarell, sans-serif;
+  background-color: #061320ff;
+  color: #e5e7eb;
+  padding: 16px;
+}
