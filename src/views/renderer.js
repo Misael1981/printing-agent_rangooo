@@ -68,3 +68,19 @@ btnTeste.addEventListener("click", async () => {
     addLog(`💥 Erro fatal: ${err.message}`);
   }
 });
+
+const badgeServer = document.getElementById("status-server");
+
+window.api.aoReceberStatusWS((status) => {
+  console.log("🌐 STATUS WS:", status);
+
+  if (status === "conectado") {
+    badgeServer.textContent = "Conectado";
+    badgeServer.style.backgroundColor = "#2ecc71";
+    addLog("🌐 Conectado ao servidor");
+  } else {
+    badgeServer.textContent = "Desconectado";
+    badgeServer.style.backgroundColor = "#e74c3c";
+    addLog("🚫 Servidor desconectado");
+  }
+});

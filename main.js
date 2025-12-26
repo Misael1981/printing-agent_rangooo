@@ -4,11 +4,12 @@ const { iniciarAgente, printerManager } = require("./src/server");
 
 let win;
 
+// 🖨️ Teste de impressão vindo da UI
 ipcMain.handle("fazer-teste-impressao", async () => {
-  console.log("Handle: Solicitando teste de impressão...");
+  console.log("🧪 Handle: teste de impressão solicitado");
+
   try {
-    const resultado = await printerManager.testPrint();
-    return resultado;
+    return await printerManager.testPrint();
   } catch (error) {
     return { success: false, error: error.message };
   }
@@ -19,7 +20,7 @@ function createWindow() {
     width: 600,
     height: 500,
     autoHideMenuBar: true,
-    // frame: false,
+    resizable: false,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
@@ -29,25 +30,38 @@ function createWindow() {
 
   global.mainWindow = win;
 
-  win.loadFile("./src/views/index.html");
+  win.loadFile(path.join(__dirname, "src/views/index.html"));
 
   win.webContents.on("did-finish-load", () => {
-    console.log("Página carregada! 🚀");
-    win.webContents.send("novo-log", "📡 Sistema Rangooo pronto para operar!");
-    iniciarAgente(win); // Liga o motor do agente aqui dentro
+    console.log("🪟 Janela carregada");
+
+    // ❗ NÃO envie status aqui
+    // Quem manda status é o agente (WS real)
+    iniciarAgente(win);
+  });
+
+  win.on("closed", () => {
+    win = null;
   });
 }
 
+// 🏓 Ping de debug
 ipcMain.handle("ping", async () => {
-  return "🏓 Pong! O processo Principal recebeu seu sinal.";
+  return "🏓 Pong do processo principal";
 });
 
+// 🚪 Fechamento correto
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();
   }
 });
 
-app.whenReady().then(() => {
-  createWindow();
+app.whenReady().then(createWindow);
+
+// 🍎 MacOS: recriar janela
+app.on("activate", () => {
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
+  }
 });

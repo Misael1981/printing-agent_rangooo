@@ -1,35 +1,51 @@
+// 1️⃣ CARREGAR ENV ANTES DE QUALQUER COISA
 const path = require("path");
-const fs = require("fs");
+require("dotenv").config({ path: path.join(process.cwd(), ".env") });
+
 const wsClient = require("./ws-client");
 const PrinterManager = require("./printer-manager");
-const printerManager = new PrinterManager();
 
-// Carregar o .env antes de tudo
-const envPath = path.join(process.cwd(), ".env");
-if (fs.existsSync(envPath)) {
-  require("dotenv").config({ path: envPath });
-}
+const printerManager = new PrinterManager();
 
 function iniciarAgente(win) {
   console.log("🚀 Motor do Agente iniciado!");
 
-  // Inicia a conexão com o Render
   wsClient.conectar((evento) => {
-    // Aqui a mágica acontece: o WS avisa o Server, e o Server avisa a TELA
+    // 🌐 STATUS DO WEBSOCKET
     if (evento.tipo === "status") {
-      win.webContents.send("status-impressora", evento.valor);
+      const statusFormatado =
+        evento.valor === "Online" ? "conectado" : "desconectado";
+
+      win.webContents.send("status-websocket", statusFormatado);
+      win.webContents.send("novo-log", `🌐 Servidor WS: ${evento.valor}`);
     }
 
+    // 📦 PEDIDO RECEBIDO (SÓ STATUS + LOG)
     if (evento.tipo === "pedido") {
-      win.webContents.send("status-impressora", "🖨️ Imprimindo...");
+      win.webContents.send(
+        "novo-log",
+        `📦 Pedido recebido: #${evento.dados.id}`
+      );
 
-      // Manda para a impressora física
-      printerManager.imprimir(evento.dados).then((sucesso) => {
-        if (sucesso) {
-          win.webContents.send("status-impressora", "Online");
-          console.log("✅ Pedido impresso e status atualizado na tela");
-        }
-      });
+      win.webContents.send("status-impressora", "🖨️ Imprimindo...");
+    }
+
+    // ✅ IMPRESSÃO OK (EVENTO OPCIONAL FUTURO)
+    if (evento.tipo === "print_sucesso") {
+      win.webContents.send("status-impressora", "Online");
+      win.webContents.send(
+        "novo-log",
+        `✅ Pedido #${evento.orderId} impresso com sucesso`
+      );
+    }
+
+    // ❌ ERRO NA IMPRESSÃO
+    if (evento.tipo === "print_erro") {
+      win.webContents.send("status-impressora", "Online");
+      win.webContents.send(
+        "novo-log",
+        `❌ Erro ao imprimir pedido #${evento.orderId}: ${evento.erro}`
+      );
     }
   });
 }

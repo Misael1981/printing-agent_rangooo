@@ -1,10 +1,20 @@
 const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("api", {
+  // Info
   verElectron: () => process.versions.electron,
-  sendPing: () => ipcRenderer.invoke("ping"), // Criando a ponte para o Ping
-  aoReceberStatus: (callback) => ipcRenderer.on("status-impressora", callback),
+
+  // Invoke
+  sendPing: () => ipcRenderer.invoke("ping"),
   executarTeste: () => ipcRenderer.invoke("fazer-teste-impressao"),
+
+  // Eventos
+  aoReceberStatus: (callback) =>
+    ipcRenderer.on("status-impressora", (_, status) => callback(status)),
+
+  aoReceberStatusWS: (callback) =>
+    ipcRenderer.on("status-websocket", (_, status) => callback(status)),
+
   receberLog: (callback) =>
-    ipcRenderer.on("novo-log", (event, msg) => callback(msg)),
+    ipcRenderer.on("novo-log", (_, msg) => callback(msg)),
 });
