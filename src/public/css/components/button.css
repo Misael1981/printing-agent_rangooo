@@ -1,0 +1,41 @@
+.btn {
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  outline: none;
+  width: 10rem;
+}
+
+.btn.connect {
+  background-color: #4361ee;
+  color: white;
+  box-shadow: 0 4px 6px rgba(67, 97, 238, 0.25);
+}
+
+.btn.connect:hover {
+  background-color: #3a56d4;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 10px rgba(67, 97, 238, 0.3);
+}
+
+.btn.connect:connect {
+  transform: translateY(0px);
+  box-shadow: 0 2px 4px rgba(67, 97, 238, 0.2);
+}
+
+.btn.disconnect {
+  background-color: #e9ecef;
+  color: #7a0a0a;
+  cursor: not-allowed;
+  box-shadow: none;
+  opacity: 0.7;
+}
+
+.btn.disconnect:hover {
+  box-shadow: none;
+  transform: none;
+}

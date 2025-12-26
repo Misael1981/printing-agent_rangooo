@@ -10,19 +10,8 @@
     <title>Agente de Impressão Rangooo</title>
     <link rel="stylesheet" href="../public/css/styles.css" />
   </head>
-  <body class="container">
-    <div>
-      <div class="badge-section">
-        <div class="badge-row">
-          <span class="badge badge-status badge-secondary">Desconectado</span>
-        </div>
-      </div>
-      <div class="header">
-        <h1>Agente de impressão Rangooo</h1>
-        <p>
-          Versão do Electron: <span id="versao-electron">Carregando...</span>
-        </p>
-      </div>
+  <body>
+    <div class="container">
       <div class="badge-section">
         <div class="badge-center">
           <p>
@@ -33,6 +22,28 @@
           </p>
         </div>
       </div>
+
+      <section class="brand">
+        <div class="brand-img">
+          <img src="../public/img/logo-agente-branca.svg" alt="logo agente" />
+        </div>
+        <div class="brand-description">
+          <h1>Agente de impressão Rangooo</h1>
+          <p>Versão: <span id="versao-electron">Carregando...</span></p>
+        </div>
+      </section>
+
+      <div class="log-container">
+        <div class="log-title">Log de Atividades</div>
+        <div id="log"></div>
+      </div>
+
+      <footer class="footer">
+        <div class="container-btns">
+          <button class="btn disconnect">Desconectar</button>
+          <button class="btn connect">Conectar</button>
+        </div>
+      </footer>
     </div>
     <script src="./renderer.js"></script>
   </body>

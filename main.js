@@ -8,7 +8,7 @@ function createWindow() {
   // Cria a janela do navegador.
   win = new BrowserWindow({
     width: 600,
-    height: 400,
+    height: 500,
     // autoHideMenuBar: true,
     //frame: false,
     webPreferences: {
