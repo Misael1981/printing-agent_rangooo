@@ -1,16 +1,25 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("node:path");
-const { iniciarAgente } = require("./src/server");
+const { iniciarAgente, printerManager } = require("./src/server");
 
 let win;
 
+ipcMain.handle("fazer-teste-impressao", async () => {
+  console.log("Handle: Solicitando teste de impressão...");
+  try {
+    const resultado = await printerManager.testPrint();
+    return resultado;
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
 function createWindow() {
-  // Cria a janela do navegador.
   win = new BrowserWindow({
     width: 600,
     height: 500,
-    // autoHideMenuBar: true,
-    //frame: false,
+    autoHideMenuBar: true,
+    // frame: false,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
@@ -18,15 +27,13 @@ function createWindow() {
     },
   });
 
+  global.mainWindow = win;
+
   win.loadFile("./src/views/index.html");
 
   win.webContents.on("did-finish-load", () => {
-    console.log("Página carregada, iniciando envios de status...");
-  });
-
-  // Assim que a janela estiver pronta, liga o motor do agente!
-  win.webContents.on("did-finish-load", () => {
     console.log("Página carregada! 🚀");
+    win.webContents.send("novo-log", "📡 Sistema Rangooo pronto para operar!");
     iniciarAgente(win); // Liga o motor do agente aqui dentro
   });
 }

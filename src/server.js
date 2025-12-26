@@ -1,7 +1,8 @@
 const path = require("path");
 const fs = require("fs");
 const wsClient = require("./ws-client");
-const printerManager = require("./printer-manager");
+const PrinterManager = require("./printer-manager");
+const printerManager = new PrinterManager();
 
 // Carregar o .env antes de tudo
 const envPath = path.join(process.cwd(), ".env");
@@ -33,4 +34,4 @@ function iniciarAgente(win) {
   });
 }
 
-module.exports = { iniciarAgente };
+module.exports = { iniciarAgente, printerManager };

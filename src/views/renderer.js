@@ -25,3 +25,46 @@ window.api.aoReceberStatus((event, status) => {
     badge.classList.add("badge-secondary");
   }
 });
+
+const logElement = document.getElementById("log");
+
+function addLog(message) {
+  const now = new Date();
+  const time = now.toLocaleTimeString("pt-BR");
+
+  const logEntry = document.createElement("div");
+  logEntry.className = "log-entry";
+  logEntry.innerHTML = `
+                <span class="log-time">[${time}]</span>
+                <span class="log-message"> ${message}</span>
+            `;
+
+  logElement.appendChild(logEntry);
+  logElement.scrollTop = logElement.scrollHeight;
+}
+
+window.api.receberLog((mensagem) => {
+  addLog(mensagem);
+});
+
+const btnTeste = document.getElementById("print-test");
+
+btnTeste.addEventListener("click", async () => {
+  addLog("🧪 Iniciando teste de impressora...");
+
+  try {
+    const res = await window.api.executarTeste();
+
+    if (res.success) {
+      if (res.simulated) {
+        addLog("⚠️ Teste concluído (MODO SIMULAÇÃO).");
+      } else {
+        addLog("✅ Teste enviado para a impressora física!");
+      }
+    } else {
+      addLog(`❌ Falha no teste: ${res.error}`);
+    }
+  } catch (err) {
+    addLog(`💥 Erro fatal: ${err.message}`);
+  }
+});

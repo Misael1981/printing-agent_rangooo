@@ -56,13 +56,14 @@ body {
   padding: 1rem;
   background: #f8fafc;
   border-radius: 0 0 20px 20px;
+  color: #1e293b;
 }
 
 .log-title {
   font-size: 1.2rem;
   font-weight: 600;
   margin-bottom: 15px;
-  color: #475569;
+  color: #061320;
 }
 
 #log {
