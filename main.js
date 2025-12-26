@@ -35,8 +35,6 @@ function createWindow() {
   win.webContents.on("did-finish-load", () => {
     console.log("🪟 Janela carregada");
 
-    // ❗ NÃO envie status aqui
-    // Quem manda status é o agente (WS real)
     iniciarAgente(win);
   });
 
