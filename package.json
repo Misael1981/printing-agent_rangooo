@@ -1,19 +1,27 @@
 {
   "name": "printing-agent_rangooo",
   "version": "1.0.0",
-  "description": "Agente para impressão de pedidos",
+  "description": "Agente de impressão local do Rangooo",
+  "author": "Misael Borges",
   "main": "main.js",
-  "directories": {
-    "doc": "docs"
-  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron ."
+    "start": "electron .",
+    "dist": "electron-builder"
   },
-  "author": "Misael",
-  "license": "ISC",
-  "devDependencies": {
-    "electron": "^39.2.7"
+  "build": {
+    "appId": "com.rangooo.agente",
+    "productName": "Agente de Impressao Rangooo",
+    "directories": {
+      "output": "dist"
+    },
+    "extraResources": [
+      ".env"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/logo.ico"
+    },
+    "npmRebuild": false
   },
   "dependencies": {
     "dotenv": "^17.2.3",
@@ -21,5 +29,9 @@
     "serialport": "^13.0.0",
     "winston": "^3.19.0",
     "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "electron": "^33.2.1",
+    "electron-builder": "^26.0.12"
   }
 }

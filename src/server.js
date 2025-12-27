@@ -1,6 +1,6 @@
 // 1️⃣ CARREGAR ENV ANTES DE QUALQUER COISA
-const path = require("path");
-require("dotenv").config({ path: path.join(process.cwd(), ".env") });
+// const path = require("path");
+// require("dotenv").config({ path: path.join(process.cwd(), ".env") });
 
 const wsClient = require("./ws-client");
 const PrinterManager = require("./printer-manager");
