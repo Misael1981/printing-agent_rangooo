@@ -17,4 +17,8 @@ contextBridge.exposeInMainWorld("api", {
 
   receberLog: (callback) =>
     ipcRenderer.on("novo-log", (_, msg) => callback(msg)),
+
+  // Tela Config
+  getRestaurantId: () => ipcRenderer.invoke("get-restaurant-id"),
+  saveRestaurantId: (id) => ipcRenderer.invoke("save-restaurant-id", id),
 });

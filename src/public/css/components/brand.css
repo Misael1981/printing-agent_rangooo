@@ -1,0 +1,43 @@
+.brand {
+  display: flex;
+  justify-content: space-between;
+}
+
+.brand-config {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.brand-img {
+  width: 3rem;
+  height: 3rem;
+
+  img {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.brand-description {
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+  p {
+    font-size: 1rem;
+  }
+}
+
+.settings {
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+
+  img {
+    width: 100%;
+    height: 100%;
+  }
+}

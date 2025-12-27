@@ -3,6 +3,8 @@ const path = require("node:path");
 const { iniciarAgente, printerManager } = require("./src/server");
 const fs = require("fs");
 const AutoLaunch = require("auto-launch");
+const Store = require("electron-store");
+const store = new Store();
 
 // Descobre se o app está rodando instalado ou em desenvolvimento
 const isDev = !app.isPackaged;
@@ -50,6 +52,13 @@ ipcMain.handle("fazer-teste-impressao", async () => {
   } catch (error) {
     return { success: false, error: error.message };
   }
+});
+
+// Telinha de config
+ipcMain.handle("get-restaurant-id", () => store.get("restaurantId"));
+ipcMain.handle("save-restaurant-id", (event, id) => {
+  store.set("restaurantId", id);
+  return { success: true };
 });
 
 function createWindow() {

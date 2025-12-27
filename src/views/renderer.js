@@ -84,3 +84,55 @@ window.api.aoReceberStatusWS((status) => {
     addLog("🚫 Servidor desconectado");
   }
 });
+
+// Telinha Config
+
+async function checarConfiguracao() {
+  const idSalvo = await window.electron.getRestaurantId();
+
+  if (!idSalvo) {
+    document.getElementById("config-screen").style.display = "block";
+  } else {
+    iniciarAgente(idSalvo);
+  }
+}
+
+const mainScreen = document.getElementById("main-screen");
+const configScreen = document.getElementById("config-screen");
+const inputId = document.getElementById("restaurant-id-input");
+const btnSalvar = document.getElementById("btn-salvar-config");
+const btnSettings = document.querySelector(".settings");
+
+window.addEventListener("DOMContentLoaded", async () => {
+  // 1. Checa se já existe um ID salvo
+  const idSalvo = await window.electron.getRestaurantId();
+
+  if (!idSalvo) {
+    // Se não tem ID, esconde os logs e mostra a config
+    mainScreen.style.display = "none";
+    configScreen.style.display = "block";
+  }
+
+  // 2. Lógica do botão Salvar
+  btnSalvar.addEventListener("click", async () => {
+    const novoId = inputId.value.trim();
+    if (novoId) {
+      await window.electron.saveRestaurantId(novoId);
+      alert("ID Salvo! Reiniciando agente...");
+      location.reload(); // Recarrega para iniciar o servidor com o novo ID
+    } else {
+      alert("Por favor, insira um ID válido.");
+    }
+  });
+});
+
+btnSettings.addEventListener("click", () => {
+  // Alterna a visibilidade: esconde os logs e mostra a config
+  mainScreen.style.display = "none";
+  configScreen.style.display = "block";
+
+  // Opcional: já preenche o input com o ID atual para ele ver qual está usando
+  window.electron.getRestaurantId().then((id) => {
+    document.getElementById("restaurant-id-input").value = id || "";
+  });
+});
