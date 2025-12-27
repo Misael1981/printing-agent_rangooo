@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("node:path");
 const { iniciarAgente, printerManager } = require("./src/server");
 const fs = require("fs");
+const AutoLaunch = require("auto-launch");
 
 // Descobre se o app está rodando instalado ou em desenvolvimento
 const isDev = !app.isPackaged;
@@ -12,6 +13,30 @@ const envPath = isDev
 
 if (fs.existsSync(envPath)) {
   require("dotenv").config({ path: envPath });
+}
+
+// Configuração do Auto-Launch
+const rangoooAutoLauncher = new AutoLaunch({
+  name: "Agente de Impressao Rangooo",
+  path: process.execPath,
+  extraArgs: ["--hidden"],
+});
+
+// Não ativa se tiver em modo de desenvolvimento
+if (!app.isPackaged) {
+  console.log("🚀 Auto-launch ignorado em modo DEV");
+} else {
+  rangoooAutoLauncher
+    .isEnabled()
+    .then((isEnabled) => {
+      if (!isEnabled) {
+        rangoooAutoLauncher.enable();
+        console.log("✅ Auto-launch ativado com sucesso");
+      }
+    })
+    .catch((err) => {
+      console.error("❌ Erro ao configurar Auto-launch:", err);
+    });
 }
 
 let win;
@@ -33,6 +58,7 @@ function createWindow() {
     height: 500,
     icon: path.join(__dirname, "assets/logo.ico"),
     autoHideMenuBar: true,
+    show: false,
     resizable: false,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
@@ -40,6 +66,10 @@ function createWindow() {
       nodeIntegration: false,
     },
   });
+
+  if (!process.argv.includes("--hidden")) {
+    win.show();
+  }
 
   global.mainWindow = win;
 

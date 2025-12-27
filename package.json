@@ -24,6 +24,7 @@
     "npmRebuild": false
   },
   "dependencies": {
+    "auto-launch": "^5.0.6",
     "dotenv": "^17.2.3",
     "node-thermal-printer": "^4.5.0",
     "serialport": "^13.0.0",
