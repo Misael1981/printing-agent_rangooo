@@ -1,9 +1,6 @@
 const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("api", {
-  // Info
-  verElectron: () => process.versions.electron,
-
   // Invoke
   sendPing: () => ipcRenderer.invoke("ping"),
   executarTeste: () => ipcRenderer.invoke("fazer-teste-impressao"),

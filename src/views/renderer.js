@@ -1,16 +1,6 @@
-async function testarPonte() {
-  const versao = window.api.verElectron();
-  document.getElementById("versao-electron").innerText = versao;
-
-  // Testando o Invoke
-  console.log("📡 Enviando Ping para o Main...");
-  const resposta = await window.api.sendPing();
-  console.log("✅ Resposta recebida:", resposta);
-}
-
-testarPonte();
-
+// Badges
 const badge = document.getElementById("status-badge");
+const badgeServer = document.getElementById("status-server");
 
 window.api.aoReceberStatus((event, status) => {
   console.log(status);
@@ -26,6 +16,21 @@ window.api.aoReceberStatus((event, status) => {
   }
 });
 
+window.api.aoReceberStatusWS((status) => {
+  console.log("🌐 STATUS WS:", status);
+
+  if (status === "conectado") {
+    badgeServer.textContent = "Conectado";
+    badgeServer.style.backgroundColor = "#2ecc71";
+    addLog("🌐 Conectado ao servidor");
+  } else {
+    badgeServer.textContent = "Desconectado";
+    badgeServer.style.backgroundColor = "#e74c3c";
+    addLog("🚫 Servidor desconectado");
+  }
+});
+
+// Logs
 const logElement = document.getElementById("log");
 
 function addLog(message) {
@@ -47,6 +52,7 @@ window.api.receberLog((mensagem) => {
   addLog(mensagem);
 });
 
+// Botão Teste da Impressora
 const btnTeste = document.getElementById("print-test");
 
 btnTeste.addEventListener("click", async () => {
@@ -66,22 +72,6 @@ btnTeste.addEventListener("click", async () => {
     }
   } catch (err) {
     addLog(`💥 Erro fatal: ${err.message}`);
-  }
-});
-
-const badgeServer = document.getElementById("status-server");
-
-window.api.aoReceberStatusWS((status) => {
-  console.log("🌐 STATUS WS:", status);
-
-  if (status === "conectado") {
-    badgeServer.textContent = "Conectado";
-    badgeServer.style.backgroundColor = "#2ecc71";
-    addLog("🌐 Conectado ao servidor");
-  } else {
-    badgeServer.textContent = "Desconectado";
-    badgeServer.style.backgroundColor = "#e74c3c";
-    addLog("🚫 Servidor desconectado");
   }
 });
 
