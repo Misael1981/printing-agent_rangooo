@@ -1,6 +1,6 @@
 {
   "name": "printing-agent_rangooo",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Agente de impressão local do Rangooo",
   "author": "Misael Borges",
   "main": "main.js",
@@ -26,7 +26,11 @@
     ],
     "win": {
       "target": "nsis",
-      "icon": "assets/logo.ico"
+      "icon": "src/public/assets/favicon.ico"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false
     },
     "npmRebuild": false
   },
