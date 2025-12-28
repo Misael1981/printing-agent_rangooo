@@ -5,6 +5,7 @@ const fs = require("fs");
 const AutoLaunch = require("auto-launch");
 const Store = require("electron-store");
 const store = new Store();
+const { autoUpdater } = require("electron-updater");
 
 // Descobre se o app está rodando instalado ou em desenvolvimento
 const isDev = !app.isPackaged;
@@ -114,4 +115,20 @@ app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
   }
+});
+
+// Quando o app estiver pronto, checa se tem atualização
+app.on("ready", () => {
+  if (app.isPackaged) {
+    autoUpdater.checkForUpdatesAndNotify();
+  }
+});
+
+// Opcional: Avisar o usuário pelo log quando estiver baixando
+autoUpdater.on("update-available", () => {
+  logger.info("Mano, tem versão nova! Baixando...");
+});
+
+autoUpdater.on("update-downloaded", () => {
+  logger.info("Atualização pronta. Reinicie para aplicar.");
 });
