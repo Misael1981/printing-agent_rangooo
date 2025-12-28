@@ -145,6 +145,11 @@ ipcMain.handle("ping", async () => {
   return "🏓 Pong do processo principal";
 });
 
+// Versão do app
+ipcMain.handle("get-app-version", () => {
+  return app.getVersion();
+});
+
 // 🚪 Fechamento correto
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {

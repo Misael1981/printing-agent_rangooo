@@ -1,6 +1,6 @@
 {
   "name": "printing-agent_rangooo",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Agente de impressão local do Rangooo",
   "author": "Misael Borges",
   "main": "main.js",

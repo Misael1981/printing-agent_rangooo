@@ -128,3 +128,9 @@ btnSettings.addEventListener("click", () => {
     document.getElementById("restaurant-id-input").value = id || "";
   });
 });
+
+// Versão do app
+window.addEventListener("DOMContentLoaded", async () => {
+  const versao = await window.api.getAppVersion();
+  document.getElementById("versao-electron").innerText = `v${versao}`;
+});

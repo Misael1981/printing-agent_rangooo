@@ -18,4 +18,7 @@ contextBridge.exposeInMainWorld("api", {
   // Tela Config
   getRestaurantId: () => ipcRenderer.invoke("get-restaurant-id"),
   saveRestaurantId: (id) => ipcRenderer.invoke("save-restaurant-id", id),
+
+  // Versão do app
+  getAppVersion: () => ipcRenderer.invoke("get-app-version"),
 });
