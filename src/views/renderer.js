@@ -79,6 +79,7 @@ btnTeste.addEventListener("click", async () => {
 
 async function checarConfiguracao() {
   const idSalvo = await window.electron.getRestaurantId();
+  console.log(window.electron);
 
   if (!idSalvo) {
     document.getElementById("config-screen").style.display = "block";
@@ -95,7 +96,7 @@ const btnSettings = document.querySelector(".settings");
 
 window.addEventListener("DOMContentLoaded", async () => {
   // 1. Checa se já existe um ID salvo
-  const idSalvo = await window.electron.getRestaurantId();
+  const idSalvo = await window.api.getRestaurantId();
 
   if (!idSalvo) {
     // Se não tem ID, esconde os logs e mostra a config
@@ -107,7 +108,8 @@ window.addEventListener("DOMContentLoaded", async () => {
   btnSalvar.addEventListener("click", async () => {
     const novoId = inputId.value.trim();
     if (novoId) {
-      await window.electron.saveRestaurantId(novoId);
+      await window.api.saveRestaurantId(novoId);
+
       alert("ID Salvo! Reiniciando agente...");
       location.reload(); // Recarrega para iniciar o servidor com o novo ID
     } else {
@@ -121,8 +123,8 @@ btnSettings.addEventListener("click", () => {
   mainScreen.style.display = "none";
   configScreen.style.display = "block";
 
-  // Opcional: já preenche o input com o ID atual para ele ver qual está usando
-  window.electron.getRestaurantId().then((id) => {
+  // Preenche o input com o ID atual para ele ver qual está usando
+  window.api.getRestaurantId().then((id) => {
     document.getElementById("restaurant-id-input").value = id || "";
   });
 });

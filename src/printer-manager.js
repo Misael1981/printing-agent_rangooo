@@ -321,7 +321,6 @@ class PrinterManager {
     return {
       connected: this.isConnected,
       interface: this.printer?.interface,
-      storeId: process.env.RESTAURANT_ID,
       queueLength: this.printQueue.length,
       isPrinting: this.isPrinting,
       lastUpdate: new Date().toISOString(),

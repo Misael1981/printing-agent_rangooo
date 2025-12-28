@@ -7,15 +7,41 @@ const Store = require("electron-store");
 const store = new Store();
 const { autoUpdater } = require("electron-updater");
 
-// Descobre se o app está rodando instalado ou em desenvolvimento
 const isDev = !app.isPackaged;
 
-const envPath = isDev
-  ? path.join(__dirname, ".env") // Em desenvolvimento, usa a pasta atual
-  : path.join(process.resourcesPath, ".env"); // Instalado, usa a pasta de recursos do Windows
+// ================================
+// 🔐 Configuração segura do .env
+// ================================
 
+let envPath;
+
+if (isDev) {
+  envPath = path.join(__dirname, ".env");
+  console.log("🧪 DEV: lendo .env local:", envPath);
+} else {
+  const userDataPath = app.getPath("userData");
+  envPath = path.join(userDataPath, ".env");
+
+  // Se não existir .env no userData, copia do resources
+  if (!fs.existsSync(envPath)) {
+    const bundledEnvPath = path.join(process.resourcesPath, ".env");
+
+    if (fs.existsSync(bundledEnvPath)) {
+      fs.copyFileSync(bundledEnvPath, envPath);
+      console.log("📦 .env copiado para userData");
+    } else {
+      console.warn("⚠️ .env não encontrado em resources");
+    }
+  }
+
+  console.log("🔐 PROD: lendo .env de:", envPath);
+}
+
+// Carrega o env definitivo
 if (fs.existsSync(envPath)) {
   require("dotenv").config({ path: envPath });
+} else {
+  console.warn("⚠️ Nenhum .env carregado");
 }
 
 // Configuração do Auto-Launch
@@ -77,6 +103,8 @@ function createWindow() {
     },
   });
 
+  // win.webContents.openDevTools({ mode: "detach" });
+
   if (!process.argv.includes("--hidden")) {
     win.show();
   }
@@ -85,10 +113,26 @@ function createWindow() {
 
   win.loadFile(path.join(__dirname, "src/views/index.html"));
 
+  function iniciarAgenteSeConfigurado(win) {
+    const restaurantId = store.get("restaurantId");
+
+    if (!restaurantId) {
+      console.log("⚠️ Restaurante não configurado ainda");
+      return;
+    }
+
+    console.log("🚀 Iniciando agente para:", restaurantId);
+
+    iniciarAgente({
+      win,
+      restaurantId,
+    });
+  }
+
   win.webContents.on("did-finish-load", () => {
     console.log("🪟 Janela carregada");
 
-    iniciarAgente(win);
+    iniciarAgenteSeConfigurado(win);
   });
 
   win.on("closed", () => {
@@ -123,6 +167,8 @@ app.on("ready", () => {
     autoUpdater.checkForUpdatesAndNotify();
   }
 });
+
+console.log("🔎 Store agora:", store.store);
 
 // Opcional: Avisar o usuário pelo log quando estiver baixando
 autoUpdater.on("update-available", () => {

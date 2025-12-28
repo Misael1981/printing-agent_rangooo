@@ -5,16 +5,28 @@ const PrinterManager = require("./printer-manager");
 const printer = new PrinterManager();
 let ws = null;
 
-function conectar(onEvento) {
-  // 🔒 Segurança básica
+/**
+ * Conecta o agente ao WebSocket
+ * @param {Object} params
+ * @param {string} params.restaurantId
+ * @param {Function} [onEvento]
+ */
+function conectar({ restaurantId, onEvento }) {
+  // 🔒 Validação obrigatória
+  if (!restaurantId) {
+    console.error("❌ restaurantId não informado ao WS client");
+    return;
+  }
+
   if (!process.env.WS_URL || !process.env.WS_SECRET) {
     console.error("❌ WS_URL ou WS_SECRET não definidos no .env");
     return;
   }
 
-  const url = `${process.env.WS_URL}?token=${process.env.WS_SECRET}&restaurantId=${process.env.RESTAURANT_ID}&role=agent`;
+  const url = `${process.env.WS_URL}?token=${process.env.WS_SECRET}&restaurantId=${restaurantId}&role=agent`;
 
   console.log("🔁 Tentando conectar ao WS...");
+  console.log("🔌 URL:", process.env.WS_URL);
 
   ws = new WebSocket(url);
 
@@ -26,8 +38,8 @@ function conectar(onEvento) {
     ws.send(
       JSON.stringify({
         type: "agent_hello",
-        restaurantId: process.env.RESTAURANT_ID,
-        agentName: process.env.AGENT_NAME || "default-agent",
+        restaurantId, // 👈 SEMPRE o dinâmico
+        agentName: process.env.AGENT_NAME || "rangooo-agent",
         capabilities: ["print"],
       })
     );
@@ -84,7 +96,9 @@ function conectar(onEvento) {
     onEvento?.({ tipo: "status", valor: "Offline" });
 
     // 🔁 Reconexão automática
-    setTimeout(() => conectar(onEvento), 5000);
+    setTimeout(() => {
+      conectar({ restaurantId, onEvento });
+    }, 5000);
   });
 
   ws.on("error", (err) => {
