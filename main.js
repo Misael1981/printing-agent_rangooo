@@ -64,7 +64,7 @@ ipcMain.handle("save-restaurant-id", (event, id) => {
 function createWindow() {
   win = new BrowserWindow({
     width: 600,
-    height: 500,
+    height: 600,
     icon: path.join(__dirname, "assets/logo.ico"),
     autoHideMenuBar: true,
     show: false,

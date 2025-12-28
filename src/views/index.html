@@ -26,6 +26,7 @@
           <img src="../public/assets/settings.svg" alt="Icon de config" />
         </button>
       </section>
+
       <section class="badge-section">
         <div class="badge-center">
           <p>
@@ -43,19 +44,9 @@
         </div>
       </section>
 
-      <section class="log-container">
-        <div class="log-title">Log de Atividades</div>
-        <div id="log"></div>
-      </section>
-
-      <footer class="footer">
-        <div class="container-btns">
-          <button id="print-test" class="btn connect">Imprimir teste</button>
-        </div>
-      </footer>
-
-      <!-- Modal de Config -->
-      <div
+      <!-- Config -->
+      <div id="main-screen"></div>
+      <section
         id="config-screen"
         style="display: none; padding: 20px; text-align: center"
       >
@@ -87,9 +78,18 @@
         >
           Salvar e Conectar
         </button>
-      </div>
+      </section>
 
-      <div id="main-screen"></div>
+      <section class="log-container">
+        <div class="log-title">Log de Atividades</div>
+        <div id="log"></div>
+      </section>
+
+      <footer class="footer">
+        <div class="container-btns">
+          <button id="print-test" class="btn connect">Imprimir teste</button>
+        </div>
+      </footer>
     </div>
     <script src="./renderer.js"></script>
   </body>
