@@ -2,6 +2,7 @@ const { ThermalPrinter, PrinterTypes } = require("node-thermal-printer");
 const winston = require("winston");
 const path = require("path");
 const fs = require("fs");
+const formatOrderPrint = require("./services/format-order-print.js");
 
 // Configurar logs
 const logDir = path.join(process.cwd(), "logs");
@@ -26,12 +27,6 @@ const logger = winston.createLogger({
     }),
     new winston.transports.Console({ format: winston.format.simple() }),
   ],
-});
-
-logger.on("data", (log) => {
-  if (global.mainWindow) {
-    global.mainWindow.webContents.send("novo-log", log.message);
-  }
 });
 
 class PrinterManager {
@@ -136,19 +131,6 @@ class PrinterManager {
     logger.error("❌ Nenhuma impressora encontrada automaticamente.");
   }
 
-  async printOrder(order) {
-    // Adiciona fila
-    this.printQueue.push(order);
-
-    // Se já tiver algo imprimindo, apenas sai (a fila processará o resto)
-    if (this.isPrinting) {
-      logger.info(`Pedido #${order.id} adicionado à fila.`);
-      return { success: true, queued: true };
-    }
-
-    return this.processQueue();
-  }
-
   async processQueue() {
     if (this.printQueue.length === 0) {
       this.isPrinting = false;
@@ -192,17 +174,19 @@ class PrinterManager {
   }
 
   async doPrint(order) {
-    // Modo simulação
     if (!this.isConnected) {
       logger.warn(`📋 Modo simulação - Pedido #${order.id} não impresso`);
       return { success: true, simulated: true };
     }
 
-    logger.info(`🖨️  Imprimindo pedido #${order.id}`);
+    logger.info(`🖨️ Imprimindo pedido #${order.id}`);
 
     try {
-      // ⏱️ TIMEOUT DE IMPRESSÃO (melhoria implementada)
-      const printPromise = this.executePrint(order);
+      const printPromise = (async () => {
+        formatOrderPrint(this.printer, order);
+        return this.printer.execute();
+      })();
+
       const timeoutPromise = new Promise((_, reject) => {
         setTimeout(() => reject(new Error("Timeout de impressão (5s)")), 5000);
       });
@@ -212,109 +196,10 @@ class PrinterManager {
       return { success: true };
     } catch (error) {
       if (error.message.includes("Timeout")) {
-        logger.error(
-          `⏰ Timeout na impressão #${order.id} - Verifique conexão`
-        );
+        logger.error(`⏰ Timeout na impressão #${order.id}`);
       }
       throw error;
     }
-  }
-
-  async executePrint(order) {
-    // Configuração inicial
-    this.printer.clear();
-    this.printer.setTypeFontB();
-
-    // Cabeçalho
-    this.printer.alignCenter();
-    this.printer.bold(true);
-    this.printer.println(process.env.STORE_NAME || "RESTAURANTE");
-    this.printer.bold(false);
-    this.printer.drawLine();
-    this.printer.newLine();
-
-    // Informações do pedido
-    this.printer.alignLeft();
-    this.printer.println(`PEDIDO: #${order.id}`);
-    this.printer.println(`DATA: ${new Date().toLocaleString("pt-BR")}`);
-    this.printer.println(`CLIENTE: ${order.customerName || "Não informado"}`);
-    this.printer.println(`TELEFONE: ${order.customerPhone || ""}`);
-    this.printer.drawLine();
-
-    // Itens
-    this.printer.bold(true);
-    this.printer.println("ITENS:");
-    this.printer.bold(false);
-
-    order.items.forEach((item) => {
-      this.printer.tableCustom([
-        { text: `${item.quantity}x`, align: "LEFT", width: 0.1 },
-        { text: item.name, align: "LEFT", width: 0.6 },
-        { text: `R$ ${item.price.toFixed(2)}`, align: "RIGHT", width: 0.3 },
-      ]);
-
-      if (item.notes) {
-        this.printer.println(`  Obs: ${item.notes}`);
-      }
-    });
-
-    this.printer.drawLine();
-
-    // Totais
-    this.printer.tableCustom([
-      { text: "SUBTOTAL:", align: "LEFT", width: 0.5 },
-      {
-        text: `R$ ${order.subtotal.toFixed(2)}`,
-        align: "RIGHT",
-        width: 0.5,
-      },
-    ]);
-
-    this.printer.tableCustom([
-      { text: "TAXA:", align: "LEFT", width: 0.5 },
-      {
-        text: `R$ ${order.deliveryFee.toFixed(2)}`,
-        align: "RIGHT",
-        width: 0.5,
-      },
-    ]);
-
-    this.printer.bold(true);
-    this.printer.tableCustom([
-      { text: "TOTAL:", align: "LEFT", width: 0.5 },
-      { text: `R$ ${order.total.toFixed(2)}`, align: "RIGHT", width: 0.5 },
-    ]);
-    this.printer.bold(false);
-
-    this.printer.drawLine();
-
-    // Forma de pagamento
-    this.printer.println(`PAGAMENTO: ${order.paymentMethod}`);
-
-    if (order.changeFor) {
-      this.printer.println(`TROCO PARA: R$ ${order.changeFor.toFixed(2)}`);
-    }
-
-    // Endereço de entrega
-    if (order.deliveryAddress) {
-      this.printer.newLine();
-      this.printer.bold(true);
-      this.printer.println("ENTREGA:");
-      this.printer.bold(false);
-      this.printer.println(order.deliveryAddress);
-    }
-
-    // Rodapé
-    this.printer.newLine();
-    this.printer.alignCenter();
-    this.printer.println("Obrigado pela preferência!");
-    this.printer.println("Volte sempre :)");
-
-    // Cortar papel
-    this.printer.cut();
-
-    // Executar impressão
-    return this.printer.execute();
   }
 
   getStatus() {
@@ -339,21 +224,23 @@ class PrinterManager {
   async testPrint() {
     try {
       const testOrder = {
-        id: "TEST-" + Date.now(),
-        customerName: "TESTE",
-        customerPhone: "(11) 99999-9999",
+        id: "1010",
+        customerName: "Teste Impressora",
+        customerPhone: "11 99999-9999",
         items: [
           {
-            name: "Item de Teste",
             quantity: 1,
-            price: 9.99,
-            notes: "Testando impressora",
+            name: "Pizza de Calabresa",
+            price: 45.0,
+            notes: "Sem cebola",
           },
+          { quantity: 2, name: "Coca-Cola 2L", price: 12.0 },
         ],
-        subtotal: 9.99,
-        deliveryFee: 0,
-        total: 9.99,
-        paymentMethod: "DINHEIRO",
+        subtotal: 69.0,
+        deliveryFee: 5.0,
+        total: 74.0,
+        paymentMethod: "Cartão de Crédito",
+        deliveryAddress: "Rua dos Devs, 128, Bairro Binário",
       };
 
       logger.info("🧪 Iniciando teste de impressão...");
