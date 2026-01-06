@@ -21,4 +21,11 @@ contextBridge.exposeInMainWorld("api", {
 
   // Versão do app
   getAppVersion: () => ipcRenderer.invoke("get-app-version"),
+
+  // Impressoras
+
+  listarImpressoras: () => ipcRenderer.invoke("listar-impressoras"),
+  testarImpressora: () => ipcRenderer.invoke("fazer-teste-impressao"),
+  salvarImpressora: (name) => ipcRenderer.invoke("salvar-impressora", name),
+  getImpressoraSalva: () => ipcRenderer.invoke("get-impressora-salva"),
 });

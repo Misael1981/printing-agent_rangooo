@@ -4,9 +4,9 @@ const { iniciarAgente, printerManager } = require("./src/server");
 const fs = require("fs");
 const AutoLaunch = require("auto-launch");
 const Store = require("electron-store");
-const store = new Store();
 const { autoUpdater } = require("electron-updater");
 
+const store = new Store();
 const isDev = !app.isPackaged;
 
 // ================================
@@ -70,17 +70,6 @@ if (!app.isPackaged) {
 
 let win;
 
-// 🖨️ Teste de impressão vindo da UI
-ipcMain.handle("fazer-teste-impressao", async () => {
-  console.log("🧪 Handle: teste de impressão solicitado");
-
-  try {
-    return await printerManager.testPrint();
-  } catch (error) {
-    return { success: false, error: error.message };
-  }
-});
-
 // Telinha de config
 ipcMain.handle("get-restaurant-id", () => store.get("restaurantId"));
 ipcMain.handle("save-restaurant-id", (event, id) => {
@@ -90,8 +79,8 @@ ipcMain.handle("save-restaurant-id", (event, id) => {
 
 function createWindow() {
   win = new BrowserWindow({
-    width: 600,
-    height: 600,
+    width: 650,
+    height: 680,
     icon: path.join(__dirname, "assets/logo.ico"),
     autoHideMenuBar: true,
     show: false,
@@ -103,7 +92,7 @@ function createWindow() {
     },
   });
 
-  // win.webContents.openDevTools({ mode: "detach" });
+  //win.webContents.openDevTools({ mode: "detach" });
 
   if (!process.argv.includes("--hidden")) {
     win.show();
@@ -150,6 +139,58 @@ ipcMain.handle("get-app-version", () => {
   return app.getVersion();
 });
 
+// Listar Impressoras
+
+ipcMain.handle("listar-impressoras", async () => {
+  const win = global.mainWindow;
+  if (!win) return [];
+  return win.webContents.getPrintersAsync();
+});
+
+ipcMain.handle("salvar-impressora", async (_, printerName) => {
+  store.set("printerName", printerName);
+  console.log("🖨️ Impressora salva:", printerName);
+  return { success: true };
+});
+
+ipcMain.handle("get-impressora-salva", async () => {
+  return store.get("printerName") || null;
+});
+
+// 🖨️ Teste de impressão vindo da UI
+ipcMain.handle("fazer-teste-impressao", async () => {
+  const win = global.mainWindow;
+
+  if (!win) {
+    return { success: false, error: "Janela principal não encontrada" };
+  }
+
+  win.webContents.print({
+    silent: false,
+    printBackground: true,
+  });
+
+  return { success: true };
+});
+
+ipcMain.handle("imprimir-com-impressora-salva", async () => {
+  const win = global.mainWindow;
+  const printerName = store.get("printerName");
+
+  if (!win || !printerName) {
+    console.warn("⚠️ Impressão cancelada: janela ou impressora inexistente");
+    return { success: false };
+  }
+
+  win.webContents.print({
+    silent: true,
+    deviceName: printerName,
+    printBackground: true,
+  });
+
+  return { success: true };
+});
+
 // 🚪 Fechamento correto
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
@@ -177,9 +218,9 @@ console.log("🔎 Store agora:", store.store);
 
 // Opcional: Avisar o usuário pelo log quando estiver baixando
 autoUpdater.on("update-available", () => {
-  logger.info("Mano, tem versão nova! Baixando...");
+  console.log("Mano, tem versão nova! Baixando...");
 });
 
 autoUpdater.on("update-downloaded", () => {
-  logger.info("Atualização pronta. Reinicie para aplicar.");
+  console.log("⬆️ Atualização disponível");
 });

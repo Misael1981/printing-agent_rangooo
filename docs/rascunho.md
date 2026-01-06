@@ -1,98 +1,112 @@
 ```
-async executePrint(order) {
-    // Configuração inicial
-    this.printer.clear();
-    this.printer.setTypeFontB();
+<div class="container">
+      <section class="brand">
+        <div class="brand-config">
+          <div class="brand-img">
+            <img src="../public/img/logo-agente-branca.svg" alt="logo agente" />
+          </div>
+          <div class="brand-description">
+            <h1>Agente de impressão Rangooo</h1>
+            <p>Versão: <span id="versao-electron">—</span></p>
+          </div>
+        </div>
+        <button class="settings">
+          <img src="../public/assets/settings.svg" alt="Icon de config" />
+        </button>
+      </section>
 
-    // Cabeçalho
-    this.printer.alignCenter();
-    this.printer.bold(true);
-    this.printer.println(process.env.STORE_NAME || "RESTAURANTE");
-    this.printer.bold(false);
-    this.printer.drawLine();
-    this.printer.newLine();
+      <section class="printer-section">
+        <div class="printer-section_content">
+          <h3>🖨️ Impressora de pedidos</h3>
+          <div>
+            <label for="printer-select">Selecione a impressora:</label>
+            <select id="printer-select">
+              <option value="">Carregando impressoras...</option>
+            </select>
+          </div>
+          <div
+            id="custom-printer-wrapper"
+            style="display: none; margin-top: 8px"
+          >
+            <label for="custom-printer-input">Nome da impressora:</label>
+            <input
+              type="text"
+              id="custom-printer-input"
+              placeholder="Ex: EPSON TM-T20"
+            />
+            <small> Use apenas se a impressora não aparecer na lista. </small>
+          </div>
+          <div class="printer-actions">
+            <button id="save-printer">Salvar</button>
+            <button id="print-test" class="print-test">Testar impressão</button>
+          </div>
+          <p id="printer-feedback" class="feedback"></p>
+        </div>
+      </section>
 
-    // Informações do pedido
-    this.printer.alignLeft();
-    this.printer.println(`PEDIDO: #${order.id}`);
-    this.printer.println(`DATA: ${new Date().toLocaleString("pt-BR")}`);
-    this.printer.println(`CLIENTE: ${order.customerName || "Não informado"}`);
-    this.printer.println(`TELEFONE: ${order.customerPhone || ""}`);
-    this.printer.drawLine();
+      <section class="badge-section">
+        <div class="badge-center">
+          <p>
+            Status impressora:
+            <span id="status-badge" class="badge badge-status badge-secondary">
+              Desconectado
+            </span>
+          </p>
+        </div>
+        <div class="badge-center">
+          <p>
+            Status Servidor:
+            <span id="status-server" class="badge offline">Desconectado</span>
+          </p>
+        </div>
+      </section>
 
-    // Itens
-    this.printer.bold(true);
-    this.printer.println("ITENS:");
-    this.printer.bold(false);
+      <!-- Config -->
+      <div id="main-screen"></div>
+      <section
+        id="config-screen"
+        style="display: none; padding: 20px; text-align: center"
+      >
+        <h3>Configuração Inicial</h3>
+        <p>Insira o ID do Restaurante para começar:</p>
+        <input
+          type="text"
+          id="restaurant-id-input"
+          placeholder="Ex: b7a8ae0d..."
+          style="
+            width: 80%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+          "
+        />
+        <br />
+        <button
+          id="btn-salvar-config"
+          style="
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+          "
+        >
+          Salvar e Conectar
+        </button>
+      </section>
 
-    order.items.forEach((item) => {
-      this.printer.tableCustom([
-        { text: `${item.quantity}x`, align: "LEFT", width: 0.1 },
-        { text: item.name, align: "LEFT", width: 0.6 },
-        { text: `R$ ${item.price.toFixed(2)}`, align: "RIGHT", width: 0.3 },
-      ]);
+      <section class="log-container">
+        <div class="log-title">Log de Atividades</div>
+        <div id="log"></div>
+      </section>
 
-      if (item.notes) {
-        this.printer.println(`  Obs: ${item.notes}`);
-      }
-    });
-
-    this.printer.drawLine();
-
-    // Totais
-    this.printer.tableCustom([
-      { text: "SUBTOTAL:", align: "LEFT", width: 0.5 },
-      {
-        text: `R$ ${order.subtotal.toFixed(2)}`,
-        align: "RIGHT",
-        width: 0.5,
-      },
-    ]);
-
-    this.printer.tableCustom([
-      { text: "TAXA:", align: "LEFT", width: 0.5 },
-      {
-        text: `R$ ${order.deliveryFee.toFixed(2)}`,
-        align: "RIGHT",
-        width: 0.5,
-      },
-    ]);
-
-    this.printer.bold(true);
-    this.printer.tableCustom([
-      { text: "TOTAL:", align: "LEFT", width: 0.5 },
-      { text: `R$ ${order.total.toFixed(2)}`, align: "RIGHT", width: 0.5 },
-    ]);
-    this.printer.bold(false);
-
-    this.printer.drawLine();
-
-    // Forma de pagamento
-    this.printer.println(`PAGAMENTO: ${order.paymentMethod}`);
-
-    if (order.changeFor) {
-      this.printer.println(`TROCO PARA: R$ ${order.changeFor.toFixed(2)}`);
-    }
-
-    // Endereço de entrega
-    if (order.deliveryAddress) {
-      this.printer.newLine();
-      this.printer.bold(true);
-      this.printer.println("ENTREGA:");
-      this.printer.bold(false);
-      this.printer.println(order.deliveryAddress);
-    }
-
-    // Rodapé
-    this.printer.newLine();
-    this.printer.alignCenter();
-    this.printer.println("Obrigado pela preferência!");
-    this.printer.println("Volte sempre :)");
-
-    // Cortar papel
-    this.printer.cut();
-
-    // Executar impressão
-    return this.printer.execute();
-  }
+      <footer class="footer">
+        <div class="container-btns">
+          <button id="print-test" class="btn connect">Imprimir teste</button>
+        </div>
+      </footer>
+    </div>
+    <script src="./renderer.js"></script>
 ```

@@ -44,52 +44,73 @@
         </div>
       </section>
 
-      <!-- Config -->
-      <div id="main-screen"></div>
-      <section
-        id="config-screen"
-        style="display: none; padding: 20px; text-align: center"
-      >
-        <h3>Configuração Inicial</h3>
-        <p>Insira o ID do Restaurante para começar:</p>
-        <input
-          type="text"
-          id="restaurant-id-input"
-          placeholder="Ex: b7a8ae0d..."
-          style="
-            width: 80%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-          "
-        />
-        <br />
-        <button
-          id="btn-salvar-config"
-          style="
-            padding: 10px 20px;
-            cursor: pointer;
-            background-color: #4caf50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-          "
-        >
-          Salvar e Conectar
-        </button>
+      <section class="printer-section">
+        <div>
+          <h3>🖨️ Impressora de pedidos</h3>
+          <label for="printer-select">Selecione a impressora:</label>
+          <select id="printer-select">
+            <option value="">Carregando impressoras...</option>
+          </select>
+          <div
+            id="custom-printer-wrapper"
+            style="display: none; margin-top: 8px"
+          >
+            <label for="custom-printer-input">Nome da impressora:</label>
+            <input
+              type="text"
+              id="custom-printer-input"
+              placeholder="Ex: EPSON TM-T20"
+            />
+            <small> Use apenas se a impressora não aparecer na lista. </small>
+          </div>
+          <div class="printer-actions">
+            <button id="save-printer" class="save-printer btns-printer">
+              Salvar
+            </button>
+            <button id="print-test" class="print-test btns-printer">
+              Testar impressão
+            </button>
+          </div>
+          <p id="printer-feedback" class="feedback"></p>
+        </div>
+        <!-- Config -->
+        <div id="main-screen"></div>
+        <section id="config-screen" style="display: none; padding: 8px">
+          <h3>Configuração Inicial</h3>
+          <p>Insira o ID do Restaurante para começar:</p>
+          <input
+            type="text"
+            id="restaurant-id-input"
+            placeholder="Ex: b7a8ae0d..."
+            style="
+              width: 80%;
+              padding: 10px;
+              margin-bottom: 15px;
+              border-radius: 5px;
+              border: 1px solid #ccc;
+            "
+          />
+          <br />
+          <button
+            id="btn-salvar-config"
+            style="
+              padding: 10px 20px;
+              cursor: pointer;
+              background-color: #4caf50;
+              color: white;
+              border: none;
+              border-radius: 5px;
+            "
+          >
+            Salvar e Conectar
+          </button>
+        </section>
       </section>
 
       <section class="log-container">
         <div class="log-title">Log de Atividades</div>
         <div id="log"></div>
       </section>
-
-      <footer class="footer">
-        <div class="container-btns">
-          <button id="print-test" class="btn connect">Imprimir teste</button>
-        </div>
-      </footer>
     </div>
     <script src="./renderer.js"></script>
   </body>

@@ -2,6 +2,7 @@
 @import "./components/button.css";
 @import "./components/brand.css";
 @import "./components/log.css";
+@import "./components/printer-section.css";
 
 * {
   margin: 0;

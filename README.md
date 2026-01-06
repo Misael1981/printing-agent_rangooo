@@ -101,3 +101,4 @@ Projeto criado como parte do ecossistema Rangooo, com foco em soluções reais p
 ## 📄 Licença
 
 Este projeto está sob a licença MIT.
+id_teste=b7a8ae0d-df91-4037-822a-a43ecac1c993

@@ -1,0 +1,104 @@
+/* Estilização Geral do Card */
+.printer-section {
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  padding: 8px;
+  max-width: 100%;
+  font-family: system-ui, -apple-system, sans-serif;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.printer-section_content h3 {
+  margin-top: 0;
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Labels e Inputs */
+.printer-section label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+select,
+input[type="text"] {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background-color: #f9fafb;
+  transition: border-color 0.2s;
+}
+
+select:focus,
+input[type="text"]:focus {
+  outline: none;
+  border-color: #3b82f6;
+  ring: 2px rgba(59, 130, 246, 0.5);
+}
+
+/* Texto auxiliar */
+small {
+  color: #6b7280;
+  font-size: 0.75rem;
+  display: block;
+  margin-top: 4px;
+}
+
+/* Botões */
+.printer-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.btns-printer {
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+
+#save-printer {
+  background-color: #2563eb;
+  color: white;
+}
+
+#save-printer:hover {
+  background-color: #1d4ed8;
+}
+
+.print-test {
+  background-color: white;
+  border-color: #d1d5db;
+  color: #374151;
+}
+
+.print-test:hover {
+  background-color: #f3f4f6;
+}
+
+/* Feedback de Status */
+.feedback {
+  margin-top: 12px;
+  font-size: 0.85rem;
+  min-height: 1.2em;
+}
+
+.feedback.success {
+  color: #059669;
+}
+.feedback.error {
+  color: #dc2626;
+}
