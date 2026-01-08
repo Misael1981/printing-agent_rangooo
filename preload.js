@@ -28,4 +28,6 @@ contextBridge.exposeInMainWorld("api", {
   testarImpressora: () => ipcRenderer.invoke("fazer-teste-impressao"),
   salvarImpressora: (name) => ipcRenderer.invoke("salvar-impressora", name),
   getImpressoraSalva: () => ipcRenderer.invoke("get-impressora-salva"),
+  imprimirComImpressoraSalva: () =>
+    ipcRenderer.invoke("imprimir-com-impressora-salva"),
 });

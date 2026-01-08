@@ -20,14 +20,67 @@ function iniciarAgente({ restaurantId, win }) {
         win.webContents.send("novo-log", `🌐 Servidor WS: ${evento.valor}`);
       }
 
-      // 📦 PEDIDO RECEBIDO
-      if (evento.tipo === "pedido") {
-        win.webContents.send(
-          "novo-log",
-          `📦 Pedido recebido: #${evento.dados.id}`
-        );
+      // 📦 PEDIDO RECEBIDO (suporta 'pedido' e 'print_order')
+      if (evento.tipo === "pedido" || evento.tipo === "print_order") {
+        // Normalizar payloads
+        const order =
+          evento.tipo === "pedido" ? evento.dados : evento.dados.order;
+        const requestId =
+          evento.tipo === "pedido" ? evento.requestId : evento.dados.requestId;
+
+        win.webContents.send("novo-log", `📦 Pedido recebido: #${order.id}`);
 
         win.webContents.send("status-impressora", "🖨️ Imprimindo...");
+
+        (async () => {
+          try {
+            const result = await printerManager.printOrder(order);
+
+            // Log detalhado do resultado
+            win.webContents.send(
+              "novo-log",
+              `📝 Resultado de impressão: ${JSON.stringify(result)}`
+            );
+
+            if (result.simulated) {
+              win.webContents.send(
+                "novo-log",
+                `⚠️ Pedido #${order.id} em modo simulação (não foi impresso fisicamente)`
+              );
+            } else {
+              win.webContents.send(
+                "novo-log",
+                `✅ Pedido #${order.id} impresso com sucesso`
+              );
+            }
+
+            win.webContents.send("status-impressora", "🟢 Pronta");
+
+            // ⚠️ IMPORTANTE: responder o WS AQUI
+            wsClient.enviarACK({
+              type: "print_done",
+              requestId,
+              orderId: order.id,
+              success: true,
+              simulated: result?.simulated || false,
+            });
+          } catch (err) {
+            win.webContents.send(
+              "novo-log",
+              `❌ Erro ao imprimir pedido #${order.id}: ${err.message}`
+            );
+
+            win.webContents.send("status-impressora", "🔴 Erro");
+
+            wsClient.enviarACK({
+              type: "print_done",
+              requestId,
+              orderId: order.id,
+              success: false,
+              error: err.message,
+            });
+          }
+        })();
       }
 
       // ❌ ERRO DE CONEXÃO

@@ -118,10 +118,34 @@ function createWindow() {
     });
   }
 
-  win.webContents.on("did-finish-load", () => {
+  win.webContents.on("did-finish-load", async () => {
     console.log("🪟 Janela carregada");
 
     iniciarAgenteSeConfigurado(win);
+
+    // Re-run printer detection now that a BrowserWindow exists (useful for Electron fallback)
+    try {
+      if (
+        printerManager &&
+        typeof printerManager.autoDetectInterface === "function"
+      ) {
+        await printerManager.autoDetectInterface();
+        console.log("🔍 Reexecução de detecção de impressoras concluída");
+      }
+
+      if (
+        printerManager &&
+        typeof printerManager.applySavedPrinter === "function"
+      ) {
+        const res = await printerManager.applySavedPrinter();
+        console.log("🔧 Resultado ao aplicar impressora salva (startup):", res);
+      }
+    } catch (e) {
+      console.warn(
+        "Erro ao reexecutar detecção de impressoras:",
+        e.message || e
+      );
+    }
   });
 
   win.on("closed", () => {
@@ -150,6 +174,23 @@ ipcMain.handle("listar-impressoras", async () => {
 ipcMain.handle("salvar-impressora", async (_, printerName) => {
   store.set("printerName", printerName);
   console.log("🖨️ Impressora salva:", printerName);
+
+  // Tenta aplicar a impressora imediatamente no PrinterManager
+  try {
+    if (
+      printerManager &&
+      typeof printerManager.applySavedPrinter === "function"
+    ) {
+      const res = await printerManager.applySavedPrinter();
+      console.log("🔧 Resultado ao aplicar impressora salva:", res);
+    }
+  } catch (e) {
+    console.warn(
+      "Erro ao aplicar impressora salva no PrinterManager:",
+      e.message || e
+    );
+  }
+
   return { success: true };
 });
 
@@ -179,16 +220,33 @@ ipcMain.handle("imprimir-com-impressora-salva", async () => {
 
   if (!win || !printerName) {
     console.warn("⚠️ Impressão cancelada: janela ou impressora inexistente");
-    return { success: false };
+    return { success: false, error: "Janela ou impressora inexistente" };
   }
 
-  win.webContents.print({
-    silent: true,
-    deviceName: printerName,
-    printBackground: true,
-  });
-
-  return { success: true };
+  try {
+    return await new Promise((resolve) => {
+      win.webContents.print(
+        {
+          silent: true,
+          deviceName: printerName,
+          printBackground: true,
+        },
+        (success, errorType) => {
+          if (success) {
+            resolve({ success: true, printer: printerName });
+          } else {
+            resolve({
+              success: false,
+              errorType: errorType || "Falha ao imprimir",
+            });
+          }
+        }
+      );
+    });
+  } catch (err) {
+    console.warn("Erro ao chamar print:", err.message || err);
+    return { success: false, error: err.message || String(err) };
+  }
 });
 
 // 🚪 Fechamento correto

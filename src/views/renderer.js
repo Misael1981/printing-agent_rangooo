@@ -17,6 +17,7 @@ const els = {
   printerSelect: document.getElementById("printer-select"),
   savePrinterBtn: document.getElementById("save-printer"),
   printTestBtn: document.getElementById("print-test"),
+  printSavedBtn: document.getElementById("print-saved"),
 };
 
 // ----- Logger -----
