@@ -1,21 +1,75 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <style>
+      * {
+        -webkit-print-color-adjust: exact !important;
+        color-adjust: exact !important;
+        color: #000 !important; /* Força cor preta */
+      }
+      body {
+        width: 72mm; /* Largura para impressora 80mm */
+        margin: 0;
+        padding: 2mm;
+        font-family: "Arial", sans-serif; /* Arial é mais seguro para drivers Windows */
+        font-size: 12pt;
+        background-color: white !important;
+      }
+      .line {
+        border-bottom: 1px solid #000 !important; /* Linha sólida aparece melhor */
+        margin: 5px 0;
+        width: 100%;
+      }
+      table {
+        width: 100%;
+      }
+    </style>
   </head>
   <body>
-    <script>
-      const params = new URLSearchParams(window.location.search);
-      const order = JSON.parse(params.get("order"));
+    <div id="conteudo">Carregando pedido...</div>
 
-      document.body.innerHTML = `
-      <h2>PEDIDO #${order.id}</h2>
-      <p>${order.customerName}</p>
-      <hr/>
-      ${order.items.map((i) => `<p>${i.quantity}x ${i.name}</p>`).join("")}
-    `;
+    <script>
+      // Pega os dados que você enviou via query: ?order={...}
+      const urlParams = new URLSearchParams(window.location.search);
+      const orderData = urlParams.get("order");
+
+      if (orderData) {
+        const order = JSON.parse(orderData);
+
+        // Monta o layout (Rápido e sujo para funcionar hoje!)
+        let html = `
+                <div class="text-center bold">AGENTE RANGOOO</div>
+                <div class="line"></div>
+                <div><b>PEDIDO:</b> #${order.id.substring(0, 8)}</div>
+                <div><b>CLIENTE:</b> ${order.customerName}</div>
+                <div class="line"></div>
+                <div class="bold">ITENS:</div>
+                <table>
+            `;
+
+        order.items.forEach((item) => {
+          html += `
+                    <tr>
+                        <td>${item.quantity}x ${item.name}</td>
+                        <td style="text-align:right">R$ ${Number(
+                          item.price
+                        ).toFixed(2)}</td>
+                    </tr>
+                `;
+        });
+
+        html += `
+                </table>
+                <div class="line"></div>
+                <div class="bold">TOTAL: R$ ${Number(order.total).toFixed(
+                  2
+                )}</div>
+                <div class="text-center" style="margin-top:10px">Obrigado!</div>
+            `;
+
+        document.getElementById("conteudo").innerHTML = html;
+      }
     </script>
   </body>
 </html>
