@@ -47,7 +47,12 @@
       <section class="printer-section">
         <div>
           <h3>🖨️ Impressora de pedidos</h3>
-          <label for="printer-select">Selecione a impressora:</label>
+          <div class="printer-select-row">
+            <label for="printer-select">Selecione a impressora:</label>
+            <button id="refresh-printers" class="btn-refresh" title="Buscar impressoras na rede">
+              🔄
+            </button>
+          </div>
           <select id="printer-select">
             <option value="">Carregando impressoras...</option>
           </select>
@@ -70,8 +75,8 @@
             <button id="print-test" class="print-test btns-printer">
               Testar impressão
             </button>
-            <button id="print-saved" class="print-saved btns-printer">
-              Testar impressora salva
+            <button id="simulate-order" class="simulate-order btns-printer">
+              🧪 Simular Pedido
             </button>
           </div>
           <p id="printer-feedback" class="feedback"></p>

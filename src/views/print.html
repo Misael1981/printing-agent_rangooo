@@ -1,21 +1,171 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Pedido</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 12px;
+        line-height: 1.4;
+        max-width: 280px;
+        margin: 0;
+        padding: 10px;
+      }
+      
+      .center {
+        text-align: center;
+      }
+      
+      .bold {
+        font-weight: bold;
+      }
+      
+      .divider {
+        border-top: 1px dashed #000;
+        margin: 8px 0;
+      }
+      
+      .item {
+        display: flex;
+        justify-content: space-between;
+        margin: 4px 0;
+      }
+      
+      .item-name {
+        flex: 1;
+      }
+      
+      .item-price {
+        margin-left: 8px;
+      }
+      
+      .notes {
+        font-size: 10px;
+        margin-left: 10px;
+        font-style: italic;
+      }
+      
+      .total-row {
+        display: flex;
+        justify-content: space-between;
+        margin: 4px 0;
+      }
+      
+      .total-final {
+        font-size: 14px;
+        font-weight: bold;
+        margin-top: 8px;
+      }
+      
+      .info-section {
+        margin: 8px 0;
+      }
+    </style>
   </head>
   <body>
     <script>
       const params = new URLSearchParams(window.location.search);
-      const order = JSON.parse(params.get("order"));
-
-      document.body.innerHTML = `
-      <h2>PEDIDO #${order.id}</h2>
-      <p>${order.customerName}</p>
-      <hr/>
-      ${order.items.map((i) => `<p>${i.quantity}x ${i.name}</p>`).join("")}
-    `;
+      const orderStr = params.get("order");
+      
+      if (!orderStr) {
+        document.body.innerHTML = '<p>Erro: Pedido não encontrado</p>';
+      } else {
+        try {
+          const order = JSON.parse(orderStr);
+          
+          const formatPrice = (price) => {
+            return new Intl.NumberFormat('pt-BR', {
+              style: 'currency',
+              currency: 'BRL'
+            }).format(price || 0);
+          };
+          
+          const formatDate = (dateStr) => {
+            const date = new Date(dateStr);
+            return date.toLocaleString('pt-BR');
+          };
+          
+          let itemsHtml = '';
+          if (order.items && Array.isArray(order.items)) {
+            itemsHtml = order.items.map(item => {
+              const itemTotal = (item.quantity || 0) * (item.price || 0);
+              return `
+                <div class="item">
+                  <span class="item-name">${item.quantity}x ${item.name}</span>
+                  <span class="item-price">${formatPrice(itemTotal)}</span>
+                </div>
+                ${item.notes ? `<div class="notes">Obs: ${item.notes}</div>` : ''}
+              `;
+            }).join('');
+          }
+          
+          document.body.innerHTML = `
+            <div class="center bold" style="font-size: 14px; margin-bottom: 10px;">
+              PEDIDO #${order.id || 'N/A'}
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="info-section">
+              <div><strong>Cliente:</strong> ${order.customerName || 'N/A'}</div>
+              <div><strong>Telefone:</strong> ${order.customerPhone || 'N/A'}</div>
+              ${order.deliveryAddress ? `<div><strong>Endereço:</strong> ${order.deliveryAddress}</div>` : ''}
+              ${order.paymentMethod ? `<div><strong>Pagamento:</strong> ${order.paymentMethod}</div>` : ''}
+              ${order.createdAt ? `<div><strong>Data:</strong> ${formatDate(order.createdAt)}</div>` : ''}
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div style="margin: 8px 0;">
+              <div class="bold" style="margin-bottom: 6px;">ITENS:</div>
+              ${itemsHtml}
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div style="margin: 8px 0;">
+              <div class="total-row">
+                <span>Subtotal:</span>
+                <span>${formatPrice(order.subtotal)}</span>
+              </div>
+              ${order.deliveryFee ? `
+                <div class="total-row">
+                  <span>Taxa de entrega:</span>
+                  <span>${formatPrice(order.deliveryFee)}</span>
+                </div>
+              ` : ''}
+              <div class="total-row total-final">
+                <span>TOTAL:</span>
+                <span>${formatPrice(order.total)}</span>
+              </div>
+            </div>
+            
+            ${order.notes ? `
+              <div class="divider"></div>
+              <div class="info-section">
+                <div class="bold">Observações:</div>
+                <div>${order.notes}</div>
+              </div>
+            ` : ''}
+            
+            <div class="divider"></div>
+            
+            <div class="center" style="margin-top: 10px; font-size: 10px;">
+              Obrigado pela preferência!
+            </div>
+          `;
+        } catch (err) {
+          document.body.innerHTML = `<p>Erro ao processar pedido: ${err.message}</p>`;
+        }
+      }
     </script>
   </body>
 </html>
