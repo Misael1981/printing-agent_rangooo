@@ -47,6 +47,21 @@
   color: white;
 }
 
+.badge-warning {
+  background-color: #f39c12;
+  color: white;
+}
+
+.badge-danger {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.badge-info {
+  background-color: #3498db;
+  color: white;
+}
+
 .badge-status::before {
   content: "";
   display: inline-block;
