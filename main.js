@@ -123,28 +123,29 @@ function createWindow() {
 
     iniciarAgenteSeConfigurado(win);
 
-    // Re-run printer detection now that a BrowserWindow exists (useful for Electron fallback)
+    // Verificar status do PrinterManager e atualizar UI
     try {
-      if (
-        printerManager &&
-        typeof printerManager.autoDetectInterface === "function"
-      ) {
-        await printerManager.autoDetectInterface();
-        console.log("🔍 Reexecução de detecção de impressoras concluída");
-      }
+      if (printerManager) {
+        const status = printerManager.getStatus();
 
-      if (
-        printerManager &&
-        typeof printerManager.applySavedPrinter === "function"
-      ) {
-        const res = await printerManager.applySavedPrinter();
-        console.log("🔧 Resultado ao aplicar impressora salva (startup):", res);
+        if (status.connected) {
+          win.webContents.send("status-impressora", "🟢 Conectada");
+          win.webContents.send(
+            "novo-log",
+            `🖨️ Impressora conectada: ${status.printerIP}`
+          );
+        } else if (status.availablePrinters.length > 0) {
+          win.webContents.send("status-impressora", "⚪ Não configurada");
+          win.webContents.send(
+            "novo-log",
+            `📋 ${status.availablePrinters.length} impressora(s) disponível(is)`
+          );
+        } else {
+          win.webContents.send("status-impressora", "🔴 Sem impressoras");
+        }
       }
     } catch (e) {
-      console.warn(
-        "Erro ao reexecutar detecção de impressoras:",
-        e.message || e
-      );
+      console.warn("Erro ao obter status:", e.message || e);
     }
   });
 
@@ -165,33 +166,65 @@ ipcMain.handle("get-app-version", () => {
 
 // Listar Impressoras
 
+// Retorna a lista de impressoras já carregadas no PrinterManager
+ipcMain.handle("get-printers", async () => {
+  if (!printerManager) return [];
+  return printerManager.availablePrinters || [];
+});
+
+// Força um novo scan e retorna a lista atualizada
+ipcMain.handle("refresh-printers", async () => {
+  if (!printerManager) return [];
+  await printerManager.scanForPrinters();
+  return printerManager.availablePrinters || [];
+});
+
+// Retorna o status completo do PrinterManager
+ipcMain.handle("get-printer-status", async () => {
+  if (!printerManager) return null;
+  return printerManager.getStatus();
+});
+
 ipcMain.handle("listar-impressoras", async () => {
   const win = global.mainWindow;
   if (!win) return [];
   return win.webContents.getPrintersAsync();
 });
 
-ipcMain.handle("salvar-impressora", async (_, printerName) => {
-  store.set("printerName", printerName);
-  console.log("🖨️ Impressora salva:", printerName);
+ipcMain.handle("salvar-impressora", async (_, printerIP) => {
+  console.log("🖨️ Conectando à impressora:", printerIP);
 
-  // Tenta aplicar a impressora imediatamente no PrinterManager
   try {
     if (
       printerManager &&
-      typeof printerManager.applySavedPrinter === "function"
+      typeof printerManager.connectToPrinter === "function"
     ) {
-      const res = await printerManager.applySavedPrinter();
-      console.log("🔧 Resultado ao aplicar impressora salva:", res);
+      const isConnected = await printerManager.connectToPrinter(printerIP);
+
+      if (isConnected) {
+        win.webContents.send("status-impressora", "🟢 Conectada");
+        win.webContents.send(
+          "novo-log",
+          `✅ Conectado à impressora ${printerIP}`
+        );
+        return { success: true, connected: true, ip: printerIP };
+      } else {
+        win.webContents.send("status-impressora", "🔴 Erro");
+        win.webContents.send(
+          "novo-log",
+          `❌ Falha ao conectar em ${printerIP}`
+        );
+        return { success: false, connected: false, ip: printerIP };
+      }
     }
   } catch (e) {
-    console.warn(
-      "Erro ao aplicar impressora salva no PrinterManager:",
-      e.message || e
-    );
+    console.warn("Erro ao conectar à impressora:", e.message || e);
+    win.webContents.send("status-impressora", "🔴 Erro");
+    win.webContents.send("novo-log", `❌ Erro: ${e.message || e}`);
+    return { success: false, error: e.message };
   }
 
-  return { success: true };
+  return { success: false, error: "PrinterManager não disponível" };
 });
 
 ipcMain.handle("get-impressora-salva", async () => {
@@ -245,6 +278,69 @@ ipcMain.handle("imprimir-com-impressora-salva", async () => {
     });
   } catch (err) {
     console.warn("Erro ao chamar print:", err.message || err);
+    return { success: false, error: err.message || String(err) };
+  }
+});
+
+// 🧪 Simular recebimento de pedido
+ipcMain.handle("simular-pedido", async () => {
+  const win = global.mainWindow;
+  if (!win) {
+    return { success: false, error: "Janela principal não encontrada" };
+  }
+
+  try {
+    const testOrder = {
+      id: `TEST-${new Date().getTime()}`,
+      customerName: "Teste Impressora",
+      customerPhone: "11 99999-9999",
+      items: [
+        {
+          quantity: 1,
+          name: "Pizza de Calabresa",
+          price: 45.0,
+          notes: "Sem cebola",
+        },
+        { quantity: 2, name: "Coca-Cola 2L", price: 12.0 },
+      ],
+      subtotal: 69.0,
+      deliveryFee: 5.0,
+      total: 74.0,
+      paymentMethod: "Cartão de Crédito",
+      deliveryAddress: "Rua dos Devs, 128, Bairro Binário",
+    };
+
+    win.webContents.send("novo-log", `🧪 Simulando pedido #${testOrder.id}`);
+
+    // Atualizar status antes de imprimir
+    win.webContents.send("status-impressora", "🖨️ Imprimindo...");
+
+    const result = await printerManager.printOrder(testOrder);
+
+    if (result.success) {
+      win.webContents.send(
+        "novo-log",
+        `✅ Pedido simulado impresso com sucesso${
+          result.simulated ? " (modo simulação)" : ""
+        }`
+      );
+      // Restaurar status após impressão
+      win.webContents.send("status-impressora", "🟢 Pronta");
+    } else {
+      win.webContents.send(
+        "novo-log",
+        `❌ Erro ao imprimir pedido simulado: ${result.error || "desconhecido"}`
+      );
+      win.webContents.send("status-impressora", "🔴 Erro");
+    }
+
+    return result;
+  } catch (err) {
+    console.error("Erro ao simular pedido:", err);
+    win.webContents.send(
+      "novo-log",
+      `❌ Erro ao simular pedido: ${err.message || err}`
+    );
     return { success: false, error: err.message || String(err) };
   }
 });

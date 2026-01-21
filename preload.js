@@ -23,11 +23,10 @@ contextBridge.exposeInMainWorld("api", {
   getAppVersion: () => ipcRenderer.invoke("get-app-version"),
 
   // Impressoras
-
-  listarImpressoras: () => ipcRenderer.invoke("listar-impressoras"),
+  getPrinters: () => ipcRenderer.invoke("get-printers"),
+  refreshPrinters: () => ipcRenderer.invoke("refresh-printers"),
+  getPrinterStatus: () => ipcRenderer.invoke("get-printer-status"),
   testarImpressora: () => ipcRenderer.invoke("fazer-teste-impressao"),
-  salvarImpressora: (name) => ipcRenderer.invoke("salvar-impressora", name),
-  getImpressoraSalva: () => ipcRenderer.invoke("get-impressora-salva"),
-  imprimirComImpressoraSalva: () =>
-    ipcRenderer.invoke("imprimir-com-impressora-salva"),
+  salvarImpressora: (ip) => ipcRenderer.invoke("salvar-impressora", ip),
+  simularPedido: () => ipcRenderer.invoke("simular-pedido"),
 });
