@@ -12,7 +12,9 @@ const { app } = require("electron");
 const appStore = new Store();
 
 // Configurar logs - usar userData do Electron
-const logDir = app ? path.join(app.getPath("userData"), "logs") : path.join(process.cwd(), "logs");
+const logDir = app
+  ? path.join(app.getPath("userData"), "logs")
+  : path.join(process.cwd(), "logs");
 
 if (!fs.existsSync(logDir)) {
   fs.mkdirSync(logDir, { recursive: true });
@@ -22,7 +24,7 @@ const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || "info",
   format: winston.format.combine(
     winston.format.timestamp(),
-    winston.format.json()
+    winston.format.json(),
   ),
   transports: [
     new winston.transports.File({
@@ -54,42 +56,30 @@ class PrinterManager {
         removeSpecialCharacters: false,
         characterSet: "PC860_PORTUGUESE",
         lineCharacter: "-",
-        options: {
-          timeout: 5000,
-        },
+        options: { timeout: 8000 },
       };
 
-      // Buscar impressoras disponíveis na rede
-      logger.info("🔍 Buscando impressoras na rede...");
-      this.availablePrinters = await this.scanForPrinters();
-      logger.info(
-        `📋 ${this.availablePrinters.length} impressora(s) encontrada(s)`
-      );
-
-      // Verificar se há uma impressora salva
       const savedIP = appStore.get("printerIP");
-
       if (savedIP) {
-        // Verificar se a impressora salva está entre as disponíveis
-        const savedPrinterAvailable = this.availablePrinters.some(
-          (p) => p.ip === savedIP
-        );
+        logger.info(`Conexão direta com IP salvo: ${savedIP}`);
+        await this.connectToPrinter(savedIP);
+      }
 
-        if (savedPrinterAvailable) {
-          logger.info(`✅ Impressora salva encontrada na rede: ${savedIP}`);
-          await this.connectToPrinter(savedIP);
-        } else {
-          logger.warn(
-            `⚠️ Impressora salva (${savedIP}) não encontrada na rede`
-          );
-        }
+      if (!this.isConnected) {
+        logger.info("🔍 Buscando impressoras na rede para backup...");
+        this.availablePrinters = await this.scanForPrinters();
+        logger.info(
+          `📋 ${this.availablePrinters.length} impressora(s) encontrada(s)`,
+        );
       }
 
       if (this.isConnected) {
-        logger.info(`🖨️ Impressora conectada: ${this.currentPrinterIP}`);
+        logger.info(
+          `✅ Status final: Impressora PRONTA em ${this.currentPrinterIP}`,
+        );
       } else {
         logger.warn(
-          "⚠️ Nenhuma impressora conectada. Selecione uma das disponíveis."
+          "⚠️ Agente iniciado sem impressora física. Verifique os cabos.",
         );
       }
     } catch (error) {
@@ -162,7 +152,7 @@ class PrinterManager {
           const result = await this.doPrint(queued);
 
           logger.info(
-            `✅ Pedido #${queued.id} finalizado | simulated=${result.simulated}`
+            `✅ Pedido #${queued.id} finalizado | simulated=${result.simulated}`,
           );
 
           if (typeof this.onResult === "function") {
@@ -173,7 +163,7 @@ class PrinterManager {
           if (typeof queued._resolve === "function") queued._resolve(result);
         } catch (err) {
           logger.error(
-            `❌ Erro no pedido #${queued.id}: ${err.message || err}`
+            `❌ Erro no pedido #${queued.id}: ${err.message || err}`,
           );
 
           if (typeof this.onError === "function") {

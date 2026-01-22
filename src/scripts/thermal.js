@@ -75,12 +75,15 @@ function formatPrint(printer, order) {
   printer.println(`TELEFONE: ${order.customerPhone || "-"}`);
   printer.drawLine();
 
-  // ===== ITENS =====
+  // ===== ITENS  =====
   printer.bold(true);
+  printer.setTextSize(2, 2); // Aumenta tamanho 2x
   printer.println("ITENS:");
+  printer.setTextSize(1, 1); // Volta ao normal
   printer.bold(false);
 
   order.items.forEach((item) => {
+    // Aumenta tamanho da fonte para os itens
     printer.tableCustom([
       { text: `${item.quantity}x`, align: "LEFT", width: 0.1 },
       { text: item.name, align: "LEFT", width: 0.6 },
@@ -90,15 +93,19 @@ function formatPrint(printer, order) {
         width: 0.3,
       },
     ]);
+    printer.executeRaw(Buffer.from([0x1d, 0x21, 0x11])); // Aumenta tamanho x2 DEPOIS da tabela
 
     if (item.notes) {
-      printer.println(`  Obs: ${item.notes}`);
+      printer.executeRaw(Buffer.from([0x1d, 0x21, 0x00])); // Volta ao normal pra notas
+      printer.bold(true);
+      printer.println(`   Obs: ${item.notes}`); // Observação em negrito para não passar batido
+      printer.bold(false);
     }
   });
 
   printer.drawLine();
 
-  // ===== TOTAIS =====
+  // ===== TOTAIS (Subtotal normal, mas vamos deixar o TOTAL final gigante abaixo) =====
   printer.tableCustom([
     { text: "SUBTOTAL:", align: "LEFT", width: 0.5 },
     {
@@ -118,6 +125,7 @@ function formatPrint(printer, order) {
   ]);
 
   printer.bold(true);
+  printer.setTextQuadArea(); // Letra MUITO grande para o valor final
   printer.tableCustom([
     { text: "TOTAL:", align: "LEFT", width: 0.5 },
     {
@@ -126,6 +134,7 @@ function formatPrint(printer, order) {
       width: 0.5,
     },
   ]);
+  printer.setTextNormal();
   printer.bold(false);
 
   printer.drawLine();
@@ -149,7 +158,7 @@ function formatPrint(printer, order) {
   // ===== RODAPÉ =====
   printer.newLine();
   printer.alignCenter();
-  printer.println("Obrigado pela preferência!");
+  printer.println("Thermal!");
   printer.println("Volte sempre :)");
 
   printer.cut();
