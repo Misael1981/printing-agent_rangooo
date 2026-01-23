@@ -43,6 +43,9 @@ module.exports = function formatOrderPrint(printer, order) {
     // Destacando os itens para a cozinha ler de longe
     printer.bold(true);
     printer.setTextDoubleHeight();
+    if (item.category) {
+      printer.println(`[${item.category.toUpperCase()}]`);
+    }
     printer.tableCustom([
       { text: `${item.quantity}x`, align: "LEFT", width: 0.1 },
       { text: item.name, align: "LEFT", width: 0.6 },
