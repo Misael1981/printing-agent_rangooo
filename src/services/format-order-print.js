@@ -1,5 +1,3 @@
-// src/services/format-order-print.js
-
 module.exports = function formatOrderPrint(printer, order) {
   printer.clear();
 
@@ -38,22 +36,20 @@ module.exports = function formatOrderPrint(printer, order) {
   printer.bold(false);
 
   order.items.forEach((item) => {
-    const totalItem = item.quantity * item.price;
+    const price = item.price || 0;
+    const quantity = item.quantity || 1;
+    const totalItem = quantity * price;
 
     // Destacando os itens para a cozinha ler de longe
     printer.bold(true);
-    printer.setTextDoubleHeight();
     if (item.category) {
-      printer.println(`[${item.category.toUpperCase()}]`);
+      // printer.setTextDoubleHeight(); // Use com moderação se o nome for longo
+      printer.println(item.category.toUpperCase());
     }
     printer.tableCustom([
-      { text: `${item.quantity}x`, align: "LEFT", width: 0.1 },
-      { text: item.name, align: "LEFT", width: 0.6 },
-      {
-        text: `R$ ${totalItem.toFixed(2)}`,
-        align: "RIGHT",
-        width: 0.3,
-      },
+      { text: `${quantity}x`, align: "LEFT", width: 0.15 },
+      { text: item.name, align: "LEFT", width: 0.55 },
+      { text: `R$ ${totalItem.toFixed(2)}`, align: "RIGHT", width: 0.3 },
     ]);
     printer.setTextNormal();
     printer.bold(false);
@@ -74,15 +70,21 @@ module.exports = function formatOrderPrint(printer, order) {
   printer.drawLine();
 
   // ===== TOTAIS =====
-  printer.tableCustom([
-    { text: "Subtotal", align: "LEFT", width: 0.5 },
-    { text: `R$ ${order.subtotal.toFixed(2)}`, align: "RIGHT", width: 0.5 },
-  ]);
+  const deliveryFee = order.deliveryFee || 0;
+  const total = order.total || 0;
+  const subtotal = order.subtotal || total - deliveryFee; // Fallback se não vier subtotal
 
   printer.tableCustom([
-    { text: "Taxa entrega", align: "LEFT", width: 0.5 },
-    { text: `R$ ${order.deliveryFee.toFixed(2)}`, align: "RIGHT", width: 0.5 },
+    { text: "Subtotal", align: "LEFT", width: 0.5 },
+    { text: `R$ ${subtotal.toFixed(2)}`, align: "RIGHT", width: 0.5 },
   ]);
+
+  if (deliveryFee > 0) {
+    printer.tableCustom([
+      { text: "Taxa entrega", align: "LEFT", width: 0.5 },
+      { text: `R$ ${deliveryFee.toFixed(2)}`, align: "RIGHT", width: 0.5 },
+    ]);
+  }
 
   // TOTAL destacado (GIGANTE)
   printer.drawLine();
@@ -97,21 +99,24 @@ module.exports = function formatOrderPrint(printer, order) {
   printer.drawLine();
 
   // ===== PAGAMENTO =====
-  printer.println(`Pagamento: ${order.paymentMethod}`);
+  printer.println(`Pagamento: ${order.payment}`);
   if (order.changeFor) {
     printer.println(`Troco para: R$ ${order.changeFor.toFixed(2)}`);
   }
 
   // ===== ENTREGA =====
-  if (order.deliveryAddress) {
+  if (order.details) {
     printer.newLine();
     printer.bold(true);
     printer.setTextDoubleHeight();
     printer.println("Entrega:");
     printer.setTextNormal();
     printer.bold(false);
-    const addr = order.deliveryAddress;
+    const addr = order.details;
+    printer.println(`${addr.areaType}`);
     printer.println(`${addr.street}, ${addr.number} - ${addr.neighborhood}`);
+    printer.println(`${addr.complement}`);
+    printer.println(`${addr.reference}`);
   }
 
   // ===== RODAPÉ =====
