@@ -61,8 +61,12 @@ class PrinterManager {
 
       const savedIP = appStore.get("printerIP");
       if (savedIP) {
-        logger.info(`Conexão direta com IP salvo: ${savedIP}`);
         await this.connectToPrinter(savedIP);
+
+        if (!this.isConnected) {
+          appStore.delete("printerIP");
+          logger.warn(`IP salvo ${savedIP} não responde, removendo...`);
+        }
       }
 
       if (!this.isConnected) {

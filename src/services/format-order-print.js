@@ -72,7 +72,7 @@ module.exports = function formatOrderPrint(printer, order) {
   // ===== TOTAIS =====
   const deliveryFee = order.deliveryFee || 0;
   const total = order.total || 0;
-  const subtotal = order.subtotal || total - deliveryFee; // Fallback se não vier subtotal
+  const subtotal = order.subtotal || total - deliveryFee;
 
   printer.tableCustom([
     { text: "Subtotal", align: "LEFT", width: 0.5 },
@@ -106,17 +106,31 @@ module.exports = function formatOrderPrint(printer, order) {
 
   // ===== ENTREGA =====
   if (order.details) {
+    const addr = order.details;
+
     printer.newLine();
     printer.bold(true);
     printer.setTextDoubleHeight();
     printer.println("Entrega:");
     printer.setTextNormal();
     printer.bold(false);
-    const addr = order.details;
-    printer.println(`${addr.areaType}`);
+
+    const area = addr.areaType === "URBAN" ? "Zona Urbana" : "Zona Rural";
+
+    printer.tableCustom([
+      { text: "Local:", align: "LEFT", width: 0.5 },
+      { text: area, align: "RIGHT", width: 0.5 },
+    ]);
+
     printer.println(`${addr.street}, ${addr.number} - ${addr.neighborhood}`);
-    printer.println(`${addr.complement}`);
-    printer.println(`${addr.reference}`);
+
+    if (addr.complement) {
+      printer.println(`Comp: ${addr.complement}`);
+    }
+
+    if (addr.reference) {
+      printer.println(`Ref: ${addr.reference}`);
+    }
   }
 
   // ===== RODAPÉ =====
