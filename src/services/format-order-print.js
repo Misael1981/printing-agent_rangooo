@@ -40,17 +40,17 @@ module.exports = function formatOrderPrint(printer, order) {
     const quantity = item.quantity || 1;
     const totalItem = quantity * price;
 
-    // Destacando os itens para a cozinha ler de longe
+    printer.setTextSize(1, 1);
     printer.bold(true);
     if (item.category) {
-      // printer.setTextDoubleHeight(); // Use com moderação se o nome for longo
       printer.println(item.category.toUpperCase());
     }
     printer.tableCustom([
-      { text: `${quantity}x`, align: "LEFT", width: 0.15 },
-      { text: item.name, align: "LEFT", width: 0.55 },
-      { text: `R$ ${totalItem.toFixed(2)}`, align: "RIGHT", width: 0.3 },
+      { text: `${quantity}x`, align: "LEFT", width: 0.1 },
+      { text: item.name, align: "LEFT", width: 0.65 },
+      { text: `R$ ${totalItem.toFixed(2)}`, align: "RIGHT", width: 0.25 },
     ]);
+
     printer.setTextNormal();
     printer.bold(false);
 
@@ -105,32 +105,52 @@ module.exports = function formatOrderPrint(printer, order) {
   }
 
   // ===== ENTREGA =====
-  if (order.details) {
-    const addr = order.details;
+  if (order.details || order.address) {
+    const addr = order.details || order.address;
+    const area = addr.areaType === "URBAN" ? "Zona Urbana" : "Zona Rural";
 
     printer.newLine();
+    printer.drawLine();
+
+    // Título da Seção
+    printer.alignCenter();
     printer.bold(true);
-    printer.setTextDoubleHeight();
-    printer.println("Entrega:");
+    printer.println("DADOS DE ENTREGA");
+    printer.bold(false);
+    printer.newLine();
+
+    printer.alignLeft();
+    printer.setTextSize(1, 0);
+    printer.bold(true);
+    printer.tableCustom([
+      { text: "LOCAL:", align: "LEFT", width: 0.4 },
+      { text: area, align: "RIGHT", width: 0.6 },
+    ]);
     printer.setTextNormal();
     printer.bold(false);
 
-    const area = addr.areaType === "URBAN" ? "Zona Urbana" : "Zona Rural";
+    printer.newLine();
+    printer.setTextSize(1, 1);
+    printer.bold(true);
 
-    printer.tableCustom([
-      { text: "Local:", align: "LEFT", width: 0.5 },
-      { text: area, align: "RIGHT", width: 0.5 },
-    ]);
+    printer.println(`${addr.street}, ${addr.number}`);
 
-    printer.println(`${addr.street}, ${addr.number} - ${addr.neighborhood}`);
+    printer.println(`${addr.neighborhood}`);
+
+    printer.setTextNormal();
+    printer.bold(false);
 
     if (addr.complement) {
       printer.println(`Comp: ${addr.complement}`);
     }
 
     if (addr.reference) {
-      printer.println(`Ref: ${addr.reference}`);
+      printer.bold(true);
+      printer.println(`REF: ${addr.reference}`);
+      printer.bold(false);
     }
+
+    printer.drawLine();
   }
 
   // ===== RODAPÉ =====
