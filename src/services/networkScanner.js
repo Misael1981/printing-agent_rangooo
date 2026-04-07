@@ -30,7 +30,7 @@ async function scanNetwork() {
 function scanPrinter(ip) {
   return new Promise((resolve) => {
     const socket = new net.Socket();
-    socket.setTimeout(1500);
+    socket.setTimeout(3000);
 
     socket.connect(9100, ip, () => {
       socket.destroy();

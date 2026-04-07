@@ -40,7 +40,7 @@ module.exports = function formatOrderPrint(printer, order) {
     const quantity = item.quantity || 1;
     const totalItem = quantity * price;
 
-    printer.setTextSize(1, 1);
+    printer.setTextSize(0, 0);
     printer.bold(true);
     if (item.category) {
       printer.println(item.category.toUpperCase());
@@ -48,7 +48,7 @@ module.exports = function formatOrderPrint(printer, order) {
     printer.tableCustom([
       { text: `${quantity}x`, align: "LEFT", width: 0.1 },
       { text: item.name, align: "LEFT", width: 0.65 },
-      { text: `R$ ${totalItem.toFixed(2)}`, align: "RIGHT", width: 0.25 },
+      // { text: `R$ ${totalItem.toFixed(2)}`, align: "RIGHT", width: 0.25 },
     ]);
 
     printer.setTextNormal();
@@ -89,7 +89,7 @@ module.exports = function formatOrderPrint(printer, order) {
   // TOTAL destacado (GIGANTE)
   printer.drawLine();
   printer.bold(true);
-  printer.setTextSize(1, 1); // Quad Area (2x2)
+  printer.setTextSize(0, 0); // Quad Area (2x2)
   printer.tableCustom([
     { text: "TOTAL", align: "LEFT", width: 0.5 },
     { text: `R$ ${order.total.toFixed(2)}`, align: "RIGHT", width: 0.5 },
@@ -120,7 +120,7 @@ module.exports = function formatOrderPrint(printer, order) {
     printer.newLine();
 
     printer.alignLeft();
-    printer.setTextSize(1, 0);
+    printer.setTextSize(0, 0);
     printer.bold(true);
     printer.tableCustom([
       { text: "LOCAL:", align: "LEFT", width: 0.4 },
@@ -130,7 +130,7 @@ module.exports = function formatOrderPrint(printer, order) {
     printer.bold(false);
 
     printer.newLine();
-    printer.setTextSize(1, 1);
+    printer.setTextSize(0, 0);
     printer.bold(true);
 
     printer.println(`${addr.street}, ${addr.number}`);
