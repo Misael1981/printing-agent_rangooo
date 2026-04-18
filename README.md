@@ -102,3 +102,38 @@ Projeto criado como parte do ecossistema Rangooo, com foco em soluções reais p
 
 Este projeto está sob a licença MIT.
 id_teste=b7a8ae0d-df91-4037-822a-a43ecac1c993
+
+```
+📤 Enviando dados para impressão: {
+  id: '9eb4714c-ab06-4aae-943c-a0490467bd20',
+  restaurantName: 'Pizzaria Jk',
+  number: '#1801',
+  customerName: 'Misael Borges',
+  customerPhone: '(35) 9 9911-0933',
+  method: 'DELIVERY',
+  deliveryFee: 3,
+  payment: 'pix',
+  items: [
+    {
+      name: '1/2 Alho e Óleo | 1/2 Atenas',
+      category: 'Pizzas Grandes',
+      quantity: 1,
+      price: 90,
+      extras: [],
+      removedIngredients: [],
+      isDouble: true,
+      flavor2: [Object]
+    }
+  ],
+  total: 93,
+  details: {
+    city: 'Congonhal',
+    number: '106',
+    street: 'Julio Fernandes De Morais',
+    areaType: 'URBAN',
+    reference: null,
+    complement: null,
+    neighborhood: 'Bela Vista '
+  }
+}
+```

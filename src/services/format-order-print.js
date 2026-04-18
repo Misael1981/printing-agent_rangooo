@@ -45,6 +45,8 @@ module.exports = function formatOrderPrint(printer, order) {
     if (item.category) {
       printer.println(item.category.toUpperCase());
     }
+
+    printer.setTextSize(1, 0);
     printer.tableCustom([
       { text: `${quantity}x`, align: "LEFT", width: 0.1 },
       { text: item.name, align: "LEFT", width: 0.65 },
@@ -89,7 +91,7 @@ module.exports = function formatOrderPrint(printer, order) {
   // TOTAL destacado (GIGANTE)
   printer.drawLine();
   printer.bold(true);
-  printer.setTextSize(0, 0); // Quad Area (2x2)
+  printer.setTextSize(0, 0);
   printer.tableCustom([
     { text: "TOTAL", align: "LEFT", width: 0.5 },
     { text: `R$ ${order.total.toFixed(2)}`, align: "RIGHT", width: 0.5 },
@@ -130,7 +132,7 @@ module.exports = function formatOrderPrint(printer, order) {
     printer.bold(false);
 
     printer.newLine();
-    printer.setTextSize(0, 0);
+    printer.setTextSize(1, 1);
     printer.bold(true);
 
     printer.println(`${addr.street}, ${addr.number}`);
