@@ -101,57 +101,88 @@ module.exports = function formatOrderPrint(printer, order) {
   printer.drawLine();
 
   // ===== PAGAMENTO =====
-  printer.println(`Pagamento: ${order.payment}`);
+  const paymentMethodsMap = {
+    cash: "Dinheiro",
+    card: "Cartão",
+    pix: "PIX",
+  };
+  printer.alignCenter();
+  printer.bold(true);
+  printer.println(
+    `Pagamento: ${paymentMethodsMap[order.payment] || order.payment}`,
+  );
   if (order.changeFor) {
     printer.println(`Troco para: R$ ${order.changeFor.toFixed(2)}`);
   }
 
+  const methodConsumptionMap = {
+    DELIVERY: "Delivery",
+    PICKUP: "Retirada",
+    DINE_IN: "Consumo no local",
+  };
+  printer.println(
+    `Método de consumo: ${methodConsumptionMap[order.method] || order.method}`,
+  );
+
   // ===== ENTREGA =====
-  if (order.details || order.address) {
-    const addr = order.details || order.address;
-    const area = addr.areaType === "URBAN" ? "Zona Urbana" : "Zona Rural";
+  if (order.method === "DELIVERY") {
+    if (order.details || order.address) {
+      const addr = order.details || order.address;
+      const area = addr.areaType === "URBAN" ? "Zona Urbana" : "Zona Rural";
 
-    printer.newLine();
-    printer.drawLine();
+      printer.newLine();
+      printer.drawLine();
 
-    // Título da Seção
+      // Título da Seção
+      printer.alignCenter();
+      printer.bold(true);
+      printer.println("DADOS DE ENTREGA");
+      printer.bold(false);
+      printer.newLine();
+
+      printer.alignLeft();
+      printer.setTextSize(0, 0);
+      printer.bold(true);
+      printer.tableCustom([
+        { text: "LOCAL:", align: "LEFT", width: 0.4 },
+        { text: area, align: "RIGHT", width: 0.6 },
+      ]);
+      printer.setTextNormal();
+      printer.bold(false);
+
+      printer.newLine();
+      printer.setTextSize(1, 0);
+      printer.bold(true);
+
+      printer.println(`${addr.street}, ${addr.number}`);
+
+      printer.println(`${addr.neighborhood}`);
+
+      printer.setTextNormal();
+      printer.bold(false);
+
+      if (addr.complement) {
+        printer.println(`Comp: ${addr.complement}`);
+      }
+
+      if (addr.reference) {
+        printer.bold(true);
+        printer.println(`REF: ${addr.reference}`);
+        printer.bold(false);
+      }
+
+      printer.drawLine();
+    }
+  }
+
+  // ===== RETIRADA =====
+  if (order.method === "PICKUP") {
     printer.alignCenter();
     printer.bold(true);
-    printer.println("DADOS DE ENTREGA");
-    printer.bold(false);
-    printer.newLine();
-
-    printer.alignLeft();
-    printer.setTextSize(0, 0);
-    printer.bold(true);
-    printer.tableCustom([
-      { text: "LOCAL:", align: "LEFT", width: 0.4 },
-      { text: area, align: "RIGHT", width: 0.6 },
-    ]);
-    printer.setTextNormal();
-    printer.bold(false);
-
-    printer.newLine();
     printer.setTextSize(1, 1);
-    printer.bold(true);
-
-    printer.println(`${addr.street}, ${addr.number}`);
-
-    printer.println(`${addr.neighborhood}`);
-
-    printer.setTextNormal();
+    printer.println(`Cliente: ${order.customerName || "Não informado"}`);
+    printer.println(`Telefone: ${order.customerPhone || "-"}`);
     printer.bold(false);
-
-    if (addr.complement) {
-      printer.println(`Comp: ${addr.complement}`);
-    }
-
-    if (addr.reference) {
-      printer.bold(true);
-      printer.println(`REF: ${addr.reference}`);
-      printer.bold(false);
-    }
-
     printer.drawLine();
   }
 

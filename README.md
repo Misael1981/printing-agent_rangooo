@@ -137,3 +137,73 @@ id_teste=b7a8ae0d-df91-4037-822a-a43ecac1c993
   }
 }
 ```
+
+```
+📤 Enviando dados para impressão: {
+  id: '17906143-4397-4525-9887-daf8c2600eac',
+  restaurantName: 'Pizzaria Jk',
+  number: '#1901',
+  customerName: 'Misael Borges',
+  customerPhone: '(35) 9 9911-0933',
+  method: 'DELIVERY',
+  deliveryFee: 3,
+  payment: 'card',
+  items: [
+    {
+      name: 'Alho e Óleo',
+      category: 'Pizzas Grandes',
+      quantity: 1,
+      price: 90,
+      extras: [],
+      removedIngredients: [],
+      isDouble: false,
+      flavor2: null
+    }
+  ],
+  total: 93,
+  details: {
+    city: 'Congonhal',
+    number: '106',
+    street: 'Julio Fernandes De Morais',
+    areaType: 'URBAN',
+    reference: null,
+    complement: null,
+    neighborhood: 'Bela Vista '
+  }
+}
+```
+
+```
+📤 Enviando dados para impressão: {
+  id: '9faac1c9-6d81-43fd-9d32-33fc485a036b',
+  restaurantName: 'Pizzaria Jk',
+  number: '#1902',
+  customerName: 'Misael Borges',
+  customerPhone: '(35) 9 9911-0933',
+  method: 'DELIVERY',
+  deliveryFee: 3,
+  payment: 'cash',
+  items: [
+    {
+      name: 'Barcelona',
+      category: 'Pizzas Grandes',
+      quantity: 1,
+      price: 90,
+      extras: [],
+      removedIngredients: [],
+      isDouble: false,
+      flavor2: null
+    }
+  ],
+  total: 93,
+  details: {
+    city: 'Congonhal',
+    number: '106',
+    street: 'Julio Fernandes De Morais',
+    areaType: 'URBAN',
+    reference: null,
+    complement: null,
+    neighborhood: 'Bela Vista '
+  }
+}
+```
