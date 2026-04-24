@@ -207,3 +207,32 @@ id_teste=b7a8ae0d-df91-4037-822a-a43ecac1c993
   }
 }
 ```
+
+### Método de retirada
+
+```
+📤 Enviando dados para impressão: {
+  id: 'f210e824-7029-4354-8ded-c3800e4c7531',
+  restaurantName: 'Pizzaria Jk',
+  number: '#2111',
+  customerName: 'Misael Borges',
+  customerPhone: '(35) 9 9911-0933',
+  method: 'PICKUP',
+  deliveryFee: 0,
+  payment: 'NOT_DEFINED',
+  items: [
+    {
+      name: 'Atum',
+      category: 'Pizzas Grandes',
+      quantity: 1,
+      price: 90,
+      extras: [],
+      removedIngredients: [],
+      isDouble: false,
+      flavor2: null
+    }
+  ],
+  total: 90,
+  details: { estimatedTime: '30' }
+}
+```

@@ -101,20 +101,23 @@ module.exports = function formatOrderPrint(printer, order) {
   printer.drawLine();
 
   // ===== PAGAMENTO =====
-  const paymentMethodsMap = {
-    cash: "Dinheiro",
-    card: "Cartão",
-    pix: "PIX",
-  };
-  printer.alignCenter();
-  printer.bold(true);
-  printer.println(
-    `Pagamento: ${paymentMethodsMap[order.payment] || order.payment}`,
-  );
-  if (order.changeFor) {
-    printer.println(`Troco para: R$ ${order.changeFor.toFixed(2)}`);
+  if (order.method === "DELIVERY") {
+    const paymentMethodsMap = {
+      cash: "Dinheiro",
+      card: "Cartão",
+      pix: "PIX",
+    };
+    printer.alignCenter();
+    printer.bold(true);
+    printer.println(
+      `Pagamento: ${paymentMethodsMap[order.payment] || order.payment}`,
+    );
+    if (order.changeFor) {
+      printer.println(`Troco para: R$ ${order.changeFor.toFixed(2)}`);
+    }
   }
 
+  printer.bold(true);
   const methodConsumptionMap = {
     DELIVERY: "Delivery",
     PICKUP: "Retirada",
@@ -123,6 +126,10 @@ module.exports = function formatOrderPrint(printer, order) {
   printer.println(
     `Método de consumo: ${methodConsumptionMap[order.method] || order.method}`,
   );
+
+  printer.drawLine();
+  printer.drawLine();
+  printer.setTextNormal();
 
   // ===== ENTREGA =====
   if (order.method === "DELIVERY") {
@@ -177,11 +184,16 @@ module.exports = function formatOrderPrint(printer, order) {
 
   // ===== RETIRADA =====
   if (order.method === "PICKUP") {
+    const estimatedTime = order.details?.estimatedPickupTime;
+
     printer.alignCenter();
     printer.bold(true);
-    printer.setTextSize(1, 1);
+    printer.setTextSize(1, 0);
     printer.println(`Cliente: ${order.customerName || "Não informado"}`);
     printer.println(`Telefone: ${order.customerPhone || "-"}`);
+    printer.println(
+      `Tempo estimado: ${order.details?.estimatedTime || "Não informado"} minutos`,
+    );
     printer.bold(false);
     printer.drawLine();
   }
