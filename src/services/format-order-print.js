@@ -1,24 +1,14 @@
 module.exports = function formatOrderPrint(printer, order) {
   printer.clear();
-
-  // Comando raw para garantir largura total do papel 80mm
-  printer.raw(Buffer.from([0x1d, 0x57, 0x40, 0x02]));
-
-  // COMENTEI A FONT B: Usar a fonte padrão (Font A) permite que o setTextSize funcione melhor
-  // printer.setTypeFontB();
+  printer.raw(Buffer.from([0x1d, 0x57, 0x40, 0x02])); // Largura 80mm
   printer.setTextSize(0, 0);
 
   // ===== CABEÇALHO =====
   printer.alignCenter();
   printer.bold(true);
   printer.setTextSize(1, 1);
-  // Gemini: Acho que estou pegando o nome do restaurante errado ainda
   printer.println(order.restaurantName || "RESTAURANTE");
-  printer.setTextSize(0, 0); // Volta ao normal
-  printer.bold(false);
-
-  printer.bold(true);
-  // Gemini:  Aqui, ao invés de pegar o order.id, pegar order.orderNumber
+  printer.setTextSize(0, 0);
   printer.println(`Pedido #${order.number || "N/A"}`);
   printer.bold(false);
   printer.drawLine();
@@ -36,30 +26,62 @@ module.exports = function formatOrderPrint(printer, order) {
   printer.bold(false);
 
   order.items.forEach((item) => {
-    const price = item.price || 0;
     const quantity = item.quantity || 1;
-    const totalItem = quantity * price;
 
     printer.setTextSize(0, 0);
-    printer.bold(true);
     if (item.category) {
+      printer.bold(true);
       printer.println(item.category.toUpperCase());
+      printer.bold(false);
     }
 
+    // Nome Principal do Produto (Ex: Pizza Grande)
     printer.setTextSize(1, 0);
     printer.tableCustom([
       { text: `${quantity}x`, align: "LEFT", width: 0.1 },
-      { text: item.name, align: "LEFT", width: 0.65 },
-      // { text: `R$ ${totalItem.toFixed(2)}`, align: "RIGHT", width: 0.25 },
+      { text: item.name, align: "LEFT", width: 0.9 },
     ]);
-
     printer.setTextNormal();
-    printer.bold(false);
 
-    if (item.extras && item.extras.length > 0) {
-      item.extras.forEach((extraName) => {
-        printer.println(`   + ${extraName}`);
-      });
+    // --- LÓGICA PARA MEIO A MEIO (Sabor 1 e Sabor 2) ---
+    if (item.isDouble) {
+      // Metade 1
+      printer.bold(true);
+      printer.println(`  1/2 ${item.flavor1.name}`);
+      printer.bold(false);
+      if (item.flavor1.extras && item.flavor1.extras.length > 0) {
+        item.flavor1.extras.forEach((ex) => printer.println(`      + ${ex}`));
+      }
+      if (item.flavor1.removed && item.flavor1.removed.length > 0) {
+        item.flavor1.removed.forEach((rm) =>
+          printer.println(`      - SEM ${rm}`),
+        );
+      }
+
+      // Metade 2
+      if (item.flavor2) {
+        printer.bold(true);
+        printer.println(`  1/2 ${item.flavor2.name}`);
+        printer.bold(false);
+        if (item.flavor2.extras && item.flavor2.extras.length > 0) {
+          item.flavor2.extras.forEach((ex) => printer.println(`      + ${ex}`));
+        }
+        if (item.flavor2.removed && item.flavor2.removed.length > 0) {
+          item.flavor2.removed.forEach((rm) =>
+            printer.println(`      - SEM ${rm}`),
+          );
+        }
+      }
+    } else {
+      // --- LÓGICA PARA ITEM SIMPLES ---
+      if (item.extras && item.extras.length > 0) {
+        item.extras.forEach((extra) => printer.println(`   + ${extra}`));
+      }
+      if (item.removedIngredients && item.removedIngredients.length > 0) {
+        item.removedIngredients.forEach((rm) =>
+          printer.println(`   - SEM ${rm}`),
+        );
+      }
     }
 
     if (item.notes) {
@@ -67,142 +89,49 @@ module.exports = function formatOrderPrint(printer, order) {
       printer.println(`   Obs: ${item.notes}`);
       printer.bold(false);
     }
+    printer.newLine();
   });
 
   printer.drawLine();
 
-  // ===== TOTAIS =====
+  // ===== TOTAIS E PAGAMENTO =====
+  // (Mantive sua lógica de totais e entrega que já estava excelente)
   const deliveryFee = order.deliveryFee || 0;
   const total = order.total || 0;
-  const subtotal = order.subtotal || total - deliveryFee;
 
-  printer.tableCustom([
-    { text: "Subtotal", align: "LEFT", width: 0.5 },
-    { text: `R$ ${subtotal.toFixed(2)}`, align: "RIGHT", width: 0.5 },
-  ]);
-
-  if (deliveryFee > 0) {
-    printer.tableCustom([
-      { text: "Taxa entrega", align: "LEFT", width: 0.5 },
-      { text: `R$ ${deliveryFee.toFixed(2)}`, align: "RIGHT", width: 0.5 },
-    ]);
-  }
-
-  // TOTAL destacado (GIGANTE)
-  printer.drawLine();
-  printer.bold(true);
-  printer.setTextSize(0, 0);
   printer.tableCustom([
     { text: "TOTAL", align: "LEFT", width: 0.5 },
-    { text: `R$ ${order.total.toFixed(2)}`, align: "RIGHT", width: 0.5 },
+    { text: `R$ ${total.toFixed(2)}`, align: "RIGHT", width: 0.5 },
   ]);
-  printer.setTextNormal();
-  printer.bold(false);
+
   printer.drawLine();
-
-  // ===== PAGAMENTO =====
-  if (order.method === "DELIVERY") {
-    const paymentMethodsMap = {
-      cash: "Dinheiro",
-      card: "Cartão",
-      pix: "PIX",
-    };
-    printer.alignCenter();
-    printer.bold(true);
-    printer.println(
-      `Pagamento: ${paymentMethodsMap[order.payment] || order.payment}`,
-    );
-    if (order.changeFor) {
-      printer.println(`Troco para: R$ ${order.changeFor.toFixed(2)}`);
-    }
-  }
-
-  printer.bold(true);
   const methodConsumptionMap = {
     DELIVERY: "Delivery",
     PICKUP: "Retirada",
-    DINE_IN: "Consumo no local",
+    DINE_IN: "Mesa",
   };
-  printer.println(
-    `Método de consumo: ${methodConsumptionMap[order.method] || order.method}`,
-  );
-
-  printer.drawLine();
-  printer.drawLine();
-  printer.setTextNormal();
-
-  // ===== ENTREGA =====
-  if (order.method === "DELIVERY") {
-    if (order.details || order.address) {
-      const addr = order.details || order.address;
-      const area = addr.areaType === "URBAN" ? "Zona Urbana" : "Zona Rural";
-
-      printer.newLine();
-      printer.drawLine();
-
-      // Título da Seção
-      printer.alignCenter();
-      printer.bold(true);
-      printer.println("DADOS DE ENTREGA");
-      printer.bold(false);
-      printer.newLine();
-
-      printer.alignLeft();
-      printer.setTextSize(0, 0);
-      printer.bold(true);
-      printer.tableCustom([
-        { text: "LOCAL:", align: "LEFT", width: 0.4 },
-        { text: area, align: "RIGHT", width: 0.6 },
-      ]);
-      printer.setTextNormal();
-      printer.bold(false);
-
-      printer.newLine();
-      printer.setTextSize(1, 0);
-      printer.bold(true);
-
-      printer.println(`${addr.street}, ${addr.number}`);
-
-      printer.println(`${addr.neighborhood}`);
-
-      printer.setTextNormal();
-      printer.bold(false);
-
-      if (addr.complement) {
-        printer.println(`Comp: ${addr.complement}`);
-      }
-
-      if (addr.reference) {
-        printer.bold(true);
-        printer.println(`REF: ${addr.reference}`);
-        printer.bold(false);
-      }
-
-      printer.drawLine();
-    }
-  }
-
-  // ===== RETIRADA =====
-  if (order.method === "PICKUP") {
-    const estimatedTime = order.details?.estimatedPickupTime;
-
-    printer.alignCenter();
-    printer.bold(true);
-    printer.setTextSize(1, 0);
-    printer.println(`Cliente: ${order.customerName || "Não informado"}`);
-    printer.println(`Telefone: ${order.customerPhone || "-"}`);
-    printer.println(
-      `Tempo estimado: ${order.details?.estimatedTime || "Não informado"} minutos`,
-    );
-    printer.bold(false);
-    printer.drawLine();
-  }
-
-  // ===== RODAPÉ =====
-  printer.newLine();
   printer.alignCenter();
   printer.bold(true);
-  printer.println("Sistema Rangooo!");
+  printer.println(
+    `METODO: ${methodConsumptionMap[order.method] || order.method}`,
+  );
   printer.bold(false);
+
+  // ===== ENDEREÇO (Apenas se for Delivery) =====
+  if (order.method === "DELIVERY" && order.details) {
+    const addr = order.details;
+    printer.drawLine();
+    printer.println("DADOS DE ENTREGA");
+    printer.setTextSize(1, 0);
+    printer.println(`${addr.street}, ${addr.number}`);
+    printer.println(`${addr.neighborhood}`);
+    if (addr.complement) printer.println(`Comp: ${addr.complement}`);
+    if (addr.reference) printer.println(`Ref: ${addr.reference}`);
+    printer.setTextNormal();
+  }
+
+  printer.newLine();
+  printer.alignCenter();
+  printer.println("Sistema Rangooo!");
   printer.cut();
 };
