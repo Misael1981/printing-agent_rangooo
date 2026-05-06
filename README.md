@@ -313,3 +313,50 @@ module.exports = function formatOrderPrint(printer, order) {
 };
 
 ```
+
+```
+DADOS ENVIADOS PARA O ELECTRON: {
+  "id": "caa99c9b-2d3f-49bc-9291-898d4955da6c",
+  "restaurantName": "Pizzaria Jk",
+  "number": "#608",
+  "customerName": "Misael Borges",
+  "customerPhone": "(35) 9 9911-0933",
+  "method": "DELIVERY",
+  "deliveryFee": 3,
+  "payment": "pix",
+  "items": [
+    {
+      "name": "1/2 Bacon | 1/2 Baiana",
+      "category": "Pizzas Pequenas",
+      "quantity": 1,
+      "price": 60,
+      "flavor1": {
+        "name": "Bacon",
+        "extras": [
+          "alho",
+          "lombo canadense"
+        ],
+        "removed": []
+      },
+      "isDouble": true,
+      "flavor2": {
+        "name": "Baiana",
+        "extras": [
+          "bacon"
+        ],
+        "removed": []
+      }
+    }
+  ],
+  "total": 74.7,
+  "details": {
+    "city": "Congonhal",
+    "number": "106",
+    "street": "Julio Fernandes De Morais",
+    "areaType": "URBAN",
+    "reference": null,
+    "complement": null,
+    "neighborhood": "Bela Vista "
+  }
+}
+```

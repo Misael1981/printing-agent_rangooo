@@ -45,28 +45,33 @@ module.exports = function formatOrderPrint(printer, order) {
 
     // --- LÓGICA PARA MEIO A MEIO (Sabor 1 e Sabor 2) ---
     if (item.isDouble) {
-      // Metade 1
-      printer.bold(true);
-      printer.println(`  1/2 ${item.flavor1.name}`);
-      printer.bold(false);
-      if (item.flavor1.extras && item.flavor1.extras.length > 0) {
-        item.flavor1.extras.forEach((ex) => printer.println(`      + ${ex}`));
-      }
-      if (item.flavor1.removed && item.flavor1.removed.length > 0) {
-        item.flavor1.removed.forEach((rm) =>
-          printer.println(`      - SEM ${rm}`),
-        );
+      // Metade 1 - Adicionada proteção ?. e Fallback
+      if (item.flavor1) {
+        printer.bold(true);
+        // O ?. garante que se flavor1 for null, ele não trava, apenas pula ou usa o padrão
+        printer.println(`  1/2 ${item.flavor1?.name || "Sabor 1"}`);
+        printer.bold(false);
+
+        if (item.flavor1?.extras?.length > 0) {
+          item.flavor1.extras.forEach((ex) => printer.println(`      + ${ex}`));
+        }
+        if (item.flavor1?.removed?.length > 0) {
+          item.flavor1.removed.forEach((rm) =>
+            printer.println(`      - SEM ${rm}`),
+          );
+        }
       }
 
       // Metade 2
       if (item.flavor2) {
         printer.bold(true);
-        printer.println(`  1/2 ${item.flavor2.name}`);
+        printer.println(`  1/2 ${item.flavor2?.name || "Sabor 2"}`);
         printer.bold(false);
-        if (item.flavor2.extras && item.flavor2.extras.length > 0) {
+
+        if (item.flavor2?.extras?.length > 0) {
           item.flavor2.extras.forEach((ex) => printer.println(`      + ${ex}`));
         }
-        if (item.flavor2.removed && item.flavor2.removed.length > 0) {
+        if (item.flavor2?.removed?.length > 0) {
           item.flavor2.removed.forEach((rm) =>
             printer.println(`      - SEM ${rm}`),
           );
@@ -74,13 +79,16 @@ module.exports = function formatOrderPrint(printer, order) {
       }
     } else {
       // --- LÓGICA PARA ITEM SIMPLES ---
-      if (item.extras && item.extras.length > 0) {
-        item.extras.forEach((extra) => printer.println(`   + ${extra}`));
+      // No seu log, itens simples usam flavor1 para extras se você seguiu o mapPrinterItem
+      const simpleExtras = item.flavor1?.extras || item.extras || [];
+      const simpleRemoved =
+        item.flavor1?.removed || item.removedIngredients || [];
+
+      if (simpleExtras.length > 0) {
+        simpleExtras.forEach((extra) => printer.println(`   + ${extra}`));
       }
-      if (item.removedIngredients && item.removedIngredients.length > 0) {
-        item.removedIngredients.forEach((rm) =>
-          printer.println(`   - SEM ${rm}`),
-        );
+      if (simpleRemoved.length > 0) {
+        simpleRemoved.forEach((rm) => printer.println(`   - SEM ${rm}`));
       }
     }
 
