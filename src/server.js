@@ -29,6 +29,10 @@ function iniciarAgente({ restaurantId, win }) {
           evento.tipo === "pedido" ? evento.requestId : evento.dados.requestId;
 
         win.webContents.send("novo-log", `📦 Pedido recebido: #${order.id}`);
+        win.webContents.send(
+          "novo-log",
+          `📄 Pedido completo: ${JSON.stringify(order, null, 2)}`,
+        );
 
         win.webContents.send("status-impressora", "🖨️ Imprimindo...");
 
@@ -39,18 +43,18 @@ function iniciarAgente({ restaurantId, win }) {
             // Log detalhado do resultado
             win.webContents.send(
               "novo-log",
-              `📝 Resultado de impressão: ${JSON.stringify(result)}`
+              `📝 Resultado de impressão: ${JSON.stringify(result)}`,
             );
 
             if (result.simulated) {
               win.webContents.send(
                 "novo-log",
-                `⚠️ Pedido #${order.id} em modo simulação (não foi impresso fisicamente)`
+                `⚠️ Pedido #${order.id} em modo simulação (não foi impresso fisicamente)`,
               );
             } else {
               win.webContents.send(
                 "novo-log",
-                `✅ Pedido #${order.id} impresso com sucesso`
+                `✅ Pedido #${order.id} impresso com sucesso`,
               );
             }
 
@@ -67,7 +71,7 @@ function iniciarAgente({ restaurantId, win }) {
           } catch (err) {
             win.webContents.send(
               "novo-log",
-              `❌ Erro ao imprimir pedido #${order.id}: ${err.message}`
+              `❌ Erro ao imprimir pedido #${order.id}: ${err.message}`,
             );
 
             win.webContents.send("status-impressora", "🔴 Erro");

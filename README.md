@@ -418,3 +418,46 @@ DADOS ENVIADOS PARA O ELECTRON: {
       }
     }
 ```
+
+```
+📄 Pedido completo: { "id": "09bf1d45-a4ec-48af-9fc5-0d37d882cee6",
+
+"restaurantName": "Pizzaria Jk",
+"number": "#711",
+"customerName": "Misael Borges",
+"customerPhone": "(35) 9 9911-0933",
+"method": "DELIVERY",
+"deliveryFee": 3,
+"payment": "pix",
+"items": [
+  { "name": "1/2 Alho e Óleo | 1/2 Atenas",
+    "category": "Pizzas Grandes",
+    "quantity": 1,
+    "price": 90,
+    "isDouble": true,
+    "flavor1": {
+      "name": "Alho e Óleo",
+      "extras": [],
+      "removed": [] },
+    "flavor2": {
+      "name": "Atenas",
+      "extras": [],
+      "removed": []
+      }
+    }
+],
+"total": 93,
+"details": {
+  "city": "Congonhal",
+  "number": "106",
+  "street": "Julio Fernandes De Morais",
+  "areaType": "URBAN",
+  "reference": null,
+  "complement": null,
+  "neighborhood": "Bela Vista "
+},
+
+"printId": "print_09bf1d45-a4ec-48af-9fc5-0d37d882cee6_1778181852035", "restaurantId": "b7a8ae0d-df91-4037-822a-a43ecac1c993" }
+[16:24:12] 📝 Resultado de impressão: {"success":true,"simulated":true,"orderId":"09bf1d45-a4ec-48af-9fc5-0d37d882cee6","printedAt":"2026-05-07T19:24:12.647Z","printerIP":null}
+[16:24:12] ⚠️ Pedido #09bf1d45-a4ec-48af-9fc5-0d37d882cee6 em modo simulação (não foi impresso fisicamente)
+```

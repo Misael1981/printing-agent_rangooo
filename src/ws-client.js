@@ -31,7 +31,7 @@ function conectar({ restaurantId, onEvento }) {
         restaurantId,
         agentName: process.env.AGENT_NAME || "rangooo-agent",
         capabilities: ["print"],
-      })
+      }),
     );
   });
 
@@ -44,7 +44,15 @@ function conectar({ restaurantId, onEvento }) {
 
       if (message.type === "print_order") {
         console.log(" Pedido recebido:", message.order.id);
+        console.log(
+          " Pedido completo:",
+          JSON.stringify(message.order, null, 2),
+        );
         logger.info(`📦 Pedido recebido via WS: #${message.order.id}`);
+        // Apagar depois
+        logger.debug(
+          `📄 Payload completo do pedido: ${JSON.stringify(message.order)}`,
+        );
 
         onEvento?.({
           tipo: "print_order",

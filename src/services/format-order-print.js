@@ -35,28 +35,9 @@ module.exports = function formatOrderPrint(printer, order) {
       printer.bold(false);
     }
 
+    printer.newLine();
     // --- LÓGICA PARA MEIO A MEIO (Sabor 1 e Sabor 2) ---
     if (item.isDouble) {
-      // Metade 1
-      printer.setTextSize(1, 0);
-      printer.bold(true);
-      printer.println(`  1/2 ${item.flavor1?.name}`);
-      printer.bold(false);
-      printer.setTextNormal();
-
-      printer.newLine();
-
-      if (item.flavor1?.extras?.length > 0) {
-        item.flavor1.extras.forEach((ex) => printer.println(`      + ${ex}`));
-        printer.newLine();
-      }
-      if (item.flavor1?.removed?.length > 0) {
-        item.flavor1.removed.forEach((rm) =>
-          printer.println(`      - SEM ${rm}`),
-        );
-        printer.newLine();
-      }
-
       // Metade 2
       printer.setTextSize(1, 0);
       printer.bold(true);
@@ -72,6 +53,24 @@ module.exports = function formatOrderPrint(printer, order) {
       }
       if (item.flavor2?.removed?.length > 0) {
         item.flavor2.removed.forEach((rm) =>
+          printer.println(`      - SEM ${rm}`),
+        );
+        printer.newLine();
+      }
+
+      // Metade 1
+      printer.setTextSize(1, 0);
+      printer.bold(true);
+      printer.println(`   1/2 ${item.flavor1?.name || "Sabor não informado"}`);
+      printer.bold(false);
+      printer.setTextNormal();
+
+      if (item.flavor1?.extras?.length > 0) {
+        item.flavor1.extras.forEach((ex) => printer.println(`      + ${ex}`));
+        printer.newLine();
+      }
+      if (item.flavor1?.removed?.length > 0) {
+        item.flavor1.removed.forEach((rm) =>
           printer.println(`      - SEM ${rm}`),
         );
         printer.newLine();

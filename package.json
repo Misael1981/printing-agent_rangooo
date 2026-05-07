@@ -1,6 +1,6 @@
 {
   "name": "printing-agent_rangooo",
-  "version": "1.0.18",
+  "version": "1.0.19",
   "description": "Agente de impressão local do Rangooo",
   "author": "Misael Borges",
   "main": "main.js",
@@ -11,27 +11,23 @@
   },
   "build": {
     "appId": "com.rangooo.agente",
+    "productName": "Agente de Impressao Rangooo",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
     "publish": [
       {
         "provider": "github",
-        "owner": "https://github.com/Misael1981",
-        "repo": "https://github.com/Misael1981/printing-agent_rangooo.git"
+        "owner": "Misael1981",
+        "repo": "printing-agent_rangooo"
       }
     ],
-    "productName": "Agente de Impressao Rangooo",
-    "directories": {
-      "output": "dist"
-    },
     "extraResources": [
       ".env"
     ],
     "win": {
       "target": "nsis",
-      "icon": "src/public/assets/icon.png"
-    },
-    "mac": {
-      "category": "public.app-category.business",
-      "target": "dmg",
       "icon": "src/public/assets/icon.png"
     },
     "nsis": {
@@ -53,5 +49,6 @@
   "devDependencies": {
     "electron": "^33.2.1",
     "electron-builder": "^26.0.12"
-  }
+  },
+  "license": "ISC"
 }
