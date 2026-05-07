@@ -35,22 +35,14 @@ module.exports = function formatOrderPrint(printer, order) {
       printer.bold(false);
     }
 
-    // Nome Principal do Produto (Ex: Pizza Grande)
-    printer.setTextSize(1, 0);
-    printer.tableCustom([
-      { text: `${quantity}x`, align: "LEFT", width: 0.1 },
-      { text: item.name, align: "LEFT", width: 0.9 },
-    ]);
-    printer.setTextNormal();
-
     // --- LÓGICA PARA MEIO A MEIO (Sabor 1 e Sabor 2) ---
     if (item.isDouble) {
-      // Metade 1 - Adicionada proteção ?. e Fallback
       if (item.flavor1) {
+        printer.setTextSize(1, 0);
         printer.bold(true);
-        // O ?. garante que se flavor1 for null, ele não trava, apenas pula ou usa o padrão
         printer.println(`  1/2 ${item.flavor1?.name || "Sabor 1"}`);
         printer.bold(false);
+        printer.setTextNormal();
 
         if (item.flavor1?.extras?.length > 0) {
           item.flavor1.extras.forEach((ex) => printer.println(`      + ${ex}`));
@@ -64,9 +56,11 @@ module.exports = function formatOrderPrint(printer, order) {
 
       // Metade 2
       if (item.flavor2) {
+        printer.setTextSize(1, 0);
         printer.bold(true);
         printer.println(`  1/2 ${item.flavor2?.name || "Sabor 2"}`);
         printer.bold(false);
+        printer.setTextNormal();
 
         if (item.flavor2?.extras?.length > 0) {
           item.flavor2.extras.forEach((ex) => printer.println(`      + ${ex}`));
@@ -79,7 +73,12 @@ module.exports = function formatOrderPrint(printer, order) {
       }
     } else {
       // --- LÓGICA PARA ITEM SIMPLES ---
-      // No seu log, itens simples usam flavor1 para extras se você seguiu o mapPrinterItem
+      printer.setTextSize(1, 0);
+      printer.tableCustom([
+        { text: `${quantity}x`, align: "LEFT", width: 0.1 },
+        { text: item.name, align: "LEFT", width: 0.9 },
+      ]);
+      printer.setTextNormal();
       const simpleExtras = item.flavor1?.extras || item.extras || [];
       const simpleRemoved =
         item.flavor1?.removed || item.removedIngredients || [];
@@ -103,7 +102,6 @@ module.exports = function formatOrderPrint(printer, order) {
   printer.drawLine();
 
   // ===== TOTAIS E PAGAMENTO =====
-  // (Mantive sua lógica de totais e entrega que já estava excelente)
   const deliveryFee = order.deliveryFee || 0;
   const total = order.total || 0;
 

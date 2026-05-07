@@ -316,9 +316,9 @@ module.exports = function formatOrderPrint(printer, order) {
 
 ```
 DADOS ENVIADOS PARA O ELECTRON: {
-  "id": "caa99c9b-2d3f-49bc-9291-898d4955da6c",
+  "id": "36c61f9c-ed6b-460c-b715-5cc2cbbbabe6",
   "restaurantName": "Pizzaria Jk",
-  "number": "#608",
+  "number": "#701",
   "customerName": "Misael Borges",
   "customerPhone": "(35) 9 9911-0933",
   "method": "DELIVERY",
@@ -326,29 +326,29 @@ DADOS ENVIADOS PARA O ELECTRON: {
   "payment": "pix",
   "items": [
     {
-      "name": "1/2 Bacon | 1/2 Baiana",
-      "category": "Pizzas Pequenas",
+      "name": "1/2 Alemã | 1/2 Atenas",
+      "category": "Pizzas Grandes",
       "quantity": 1,
-      "price": 60,
+      "price": 90,
       "flavor1": {
-        "name": "Bacon",
+        "name": "Alemã",
         "extras": [
-          "alho",
-          "lombo canadense"
+          "bacon",
+          "tomate seco"
         ],
         "removed": []
       },
       "isDouble": true,
       "flavor2": {
-        "name": "Baiana",
+        "name": "Atenas",
         "extras": [
-          "bacon"
+          "alho"
         ],
         "removed": []
       }
     }
   ],
-  "total": 74.7,
+  "total": 104.7,
   "details": {
     "city": "Congonhal",
     "number": "106",
