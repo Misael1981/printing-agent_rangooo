@@ -360,3 +360,61 @@ DADOS ENVIADOS PARA O ELECTRON: {
   }
 }
 ```
+
+```
+ // --- LÓGICA PARA MEIO A MEIO (Sabor 1 e Sabor 2) ---
+    if (item.isDouble) {
+      if (item.flavor1) {
+        printer.setTextSize(1, 0);
+        printer.bold(true);
+        printer.println(`  1/2 ${item.flavor1?.name || "Sabor 1"}`);
+        printer.bold(false);
+        printer.setTextNormal();
+
+        if (item.flavor1?.extras?.length > 0) {
+          item.flavor1.extras.forEach((ex) => printer.println(`      + ${ex}`));
+        }
+        if (item.flavor1?.removed?.length > 0) {
+          item.flavor1.removed.forEach((rm) =>
+            printer.println(`      - SEM ${rm}`),
+          );
+        }
+      }
+
+      // Metade 2
+      if (item.flavor2) {
+        printer.setTextSize(1, 0);
+        printer.bold(true);
+        printer.println(`  1/2 ${item.flavor2?.name || "Sabor 2"}`);
+        printer.bold(false);
+        printer.setTextNormal();
+
+        if (item.flavor2?.extras?.length > 0) {
+          item.flavor2.extras.forEach((ex) => printer.println(`      + ${ex}`));
+        }
+        if (item.flavor2?.removed?.length > 0) {
+          item.flavor2.removed.forEach((rm) =>
+            printer.println(`      - SEM ${rm}`),
+          );
+        }
+      }
+    } else {
+      // --- LÓGICA PARA ITEM SIMPLES ---
+      printer.setTextSize(1, 0);
+      printer.tableCustom([
+        { text: `${quantity}x`, align: "LEFT", width: 0.1 },
+        { text: item.name, align: "LEFT", width: 0.9 },
+      ]);
+      printer.setTextNormal();
+      const simpleExtras = item.flavor1?.extras || item.extras || [];
+      const simpleRemoved =
+        item.flavor1?.removed || item.removedIngredients || [];
+
+      if (simpleExtras.length > 0) {
+        simpleExtras.forEach((extra) => printer.println(`   + ${extra}`));
+      }
+      if (simpleRemoved.length > 0) {
+        simpleRemoved.forEach((rm) => printer.println(`   - SEM ${rm}`));
+      }
+    }
+```

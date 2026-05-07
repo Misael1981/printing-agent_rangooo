@@ -37,39 +37,44 @@ module.exports = function formatOrderPrint(printer, order) {
 
     // --- LÓGICA PARA MEIO A MEIO (Sabor 1 e Sabor 2) ---
     if (item.isDouble) {
-      if (item.flavor1) {
-        printer.setTextSize(1, 0);
-        printer.bold(true);
-        printer.println(`  1/2 ${item.flavor1?.name || "Sabor 1"}`);
-        printer.bold(false);
-        printer.setTextNormal();
+      // Metade 1
+      printer.setTextSize(1, 0);
+      printer.bold(true);
+      printer.println(`  1/2 ${item.flavor1?.name}`);
+      printer.bold(false);
+      printer.setTextNormal();
 
-        if (item.flavor1?.extras?.length > 0) {
-          item.flavor1.extras.forEach((ex) => printer.println(`      + ${ex}`));
-        }
-        if (item.flavor1?.removed?.length > 0) {
-          item.flavor1.removed.forEach((rm) =>
-            printer.println(`      - SEM ${rm}`),
-          );
-        }
+      printer.newLine();
+
+      if (item.flavor1?.extras?.length > 0) {
+        item.flavor1.extras.forEach((ex) => printer.println(`      + ${ex}`));
+        printer.newLine();
+      }
+      if (item.flavor1?.removed?.length > 0) {
+        item.flavor1.removed.forEach((rm) =>
+          printer.println(`      - SEM ${rm}`),
+        );
+        printer.newLine();
       }
 
       // Metade 2
-      if (item.flavor2) {
-        printer.setTextSize(1, 0);
-        printer.bold(true);
-        printer.println(`  1/2 ${item.flavor2?.name || "Sabor 2"}`);
-        printer.bold(false);
-        printer.setTextNormal();
+      printer.setTextSize(1, 0);
+      printer.bold(true);
+      printer.println(`  1/2 ${item.flavor2?.name}`);
+      printer.bold(false);
+      printer.setTextNormal();
 
-        if (item.flavor2?.extras?.length > 0) {
-          item.flavor2.extras.forEach((ex) => printer.println(`      + ${ex}`));
-        }
-        if (item.flavor2?.removed?.length > 0) {
-          item.flavor2.removed.forEach((rm) =>
-            printer.println(`      - SEM ${rm}`),
-          );
-        }
+      printer.newLine();
+
+      if (item.flavor2?.extras?.length > 0) {
+        item.flavor2.extras.forEach((ex) => printer.println(`      + ${ex}`));
+        printer.newLine();
+      }
+      if (item.flavor2?.removed?.length > 0) {
+        item.flavor2.removed.forEach((rm) =>
+          printer.println(`      - SEM ${rm}`),
+        );
+        printer.newLine();
       }
     } else {
       // --- LÓGICA PARA ITEM SIMPLES ---
