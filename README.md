@@ -457,7 +457,8 @@ DADOS ENVIADOS PARA O ELECTRON: {
   "neighborhood": "Bela Vista "
 },
 
-"printId": "print_09bf1d45-a4ec-48af-9fc5-0d37d882cee6_1778181852035", "restaurantId": "b7a8ae0d-df91-4037-822a-a43ecac1c993" }
-[16:24:12] 📝 Resultado de impressão: {"success":true,"simulated":true,"orderId":"09bf1d45-a4ec-48af-9fc5-0d37d882cee6","printedAt":"2026-05-07T19:24:12.647Z","printerIP":null}
-[16:24:12] ⚠️ Pedido #09bf1d45-a4ec-48af-9fc5-0d37d882cee6 em modo simulação (não foi impresso fisicamente)
+"printId": "print_09bf1d45-a4ec-48af-9fc5-0d37d882cee6_1778181852035",
+"restaurantId": "b7a8ae0d-df91-4037-822a-a43ecac1c993"
+}
+
 ```

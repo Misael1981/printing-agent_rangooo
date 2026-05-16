@@ -34,6 +34,16 @@ function iniciarAgente({ restaurantId, win }) {
           `📄 Pedido completo: ${JSON.stringify(order, null, 2)}`,
         );
 
+        // Iterar sobre os itens do pedido (assumindo que order.items existe)
+        // if (order.items && Array.isArray(order.items)) {
+        //   order.items.forEach((item, index) => {
+        //     win.webContents.send(
+        //       "novo-log",
+        //       `🍦 Item ${index + 1}: Sabor 1 - ${item.flavor1?.name || "N/A"}, Sabor 2 - ${item.flavor2?.name || "N/A"}`,
+        //     );
+        //   });
+        // }
+
         win.webContents.send("status-impressora", "🖨️ Imprimindo...");
 
         (async () => {

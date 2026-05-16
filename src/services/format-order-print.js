@@ -1,7 +1,16 @@
 module.exports = function formatOrderPrint(printer, order) {
   printer.clear();
-  printer.raw(Buffer.from([0x1d, 0x57, 0x40, 0x02])); // Largura 80mm
+
+  // largura 80mm
+  printer.raw(Buffer.from([0x1d, 0x57, 0x40, 0x02]));
+
+  // charset português
+  printer.raw(Buffer.from([0x1b, 0x74, 22]));
   printer.setTextSize(0, 0);
+
+  const charsetCommand = Buffer.from([0x1b, 0x74, 22]); // CP860 Português
+
+  const content = Buffer.concat([charsetCommand, Buffer.from(texto, "binary")]);
 
   // ===== CABEÇALHO =====
   printer.alignCenter();
@@ -61,7 +70,7 @@ module.exports = function formatOrderPrint(printer, order) {
       // Metade 1
       printer.setTextSize(1, 0);
       printer.bold(true);
-      printer.println(`   1/2 ${item.flavor1?.name || "Sabor não informado"}`);
+      printer.println(`   1/2 ${item.flavor1?.name}`);
       printer.bold(false);
       printer.setTextNormal();
 
@@ -128,6 +137,23 @@ module.exports = function formatOrderPrint(printer, order) {
   printer.bold(false);
 
   // ===== ENDEREÇO (Apenas se for Delivery) =====
+
+  if (order.method === "DELIVERY") {
+    const paymentMethodsMap = {
+      cash: "Dinheiro",
+      card: "Cartão",
+      pix: "PIX",
+    };
+    printer.alignCenter();
+    printer.bold(true);
+    printer.println(
+      `Pagamento: ${paymentMethodsMap[order.payment] || order.payment}`,
+    );
+    if (order.changeFor) {
+      printer.println(`Troco para: R$ ${order.changeFor.toFixed(2)}`);
+    }
+  }
+
   if (order.method === "DELIVERY" && order.details) {
     const addr = order.details;
     printer.drawLine();
