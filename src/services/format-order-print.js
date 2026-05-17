@@ -3,14 +3,7 @@ module.exports = function formatOrderPrint(printer, order) {
 
   // largura 80mm
   printer.raw(Buffer.from([0x1d, 0x57, 0x40, 0x02]));
-
-  // charset português
-  printer.raw(Buffer.from([0x1b, 0x74, 22]));
   printer.setTextSize(0, 0);
-
-  const charsetCommand = Buffer.from([0x1b, 0x74, 22]); // CP860 Português
-
-  const content = Buffer.concat([charsetCommand, Buffer.from(texto, "binary")]);
 
   // ===== CABEÇALHO =====
   printer.alignCenter();
