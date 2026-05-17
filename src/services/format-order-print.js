@@ -161,6 +161,7 @@ module.exports = function formatOrderPrint(printer, order) {
     printer.setTextSize(1, 0);
     printer.println(`${addr.street}, ${addr.number}`);
     printer.println(`${addr.neighborhood}`);
+    printer.setTextSize(0, 0);
     if (addr.complement) printer.println(`Comp: ${addr.complement}`);
     if (addr.reference) printer.println(`Ref: ${addr.reference}`);
     printer.setTextNormal();
