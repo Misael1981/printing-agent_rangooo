@@ -43,7 +43,7 @@ module.exports = function formatOrderPrint(printer, order) {
       // Metade 2
       printer.setTextSize(1, 0);
       printer.bold(true);
-      printer.println(`  1/2 ${item.flavor2?.name}`);
+      printer.println(`1/2 ${item.flavor2?.name}`);
       printer.bold(false);
       printer.setTextNormal();
 
@@ -63,7 +63,7 @@ module.exports = function formatOrderPrint(printer, order) {
       // Metade 1
       printer.setTextSize(1, 0);
       printer.bold(true);
-      printer.println(`   1/2 ${item.flavor1?.name}`);
+      printer.println(`1/2 ${item.flavor1?.name}`);
       printer.bold(false);
       printer.setTextNormal();
 
