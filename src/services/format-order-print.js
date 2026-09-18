@@ -53,6 +53,7 @@ module.exports = function formatOrderPrint(printer, order) {
         item.flavor2.extras.forEach((ex) => printer.println(`      + ${ex}`));
         printer.newLine();
       }
+
       if (item.flavor2?.removed?.length > 0) {
         item.flavor2.removed.forEach((rm) =>
           printer.println(`      - SEM ${rm}`),

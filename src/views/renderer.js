@@ -50,7 +50,7 @@ function setupStatusListeners() {
       "badge-success",
       "badge-warning",
       "badge-danger",
-      "badge-info"
+      "badge-info",
     );
 
     // Aplicar classe baseada no status
@@ -240,7 +240,7 @@ function bindPrinterEvents() {
           addLog(
             `✅ Pedido simulado impresso${
               result.simulated ? " (modo simulação)" : ""
-            }!`
+            }!`,
           );
           if (els.feedback) {
             els.feedback.textContent = `✅ Pedido simulado impresso${
