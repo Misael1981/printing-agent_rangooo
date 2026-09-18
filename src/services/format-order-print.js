@@ -1,3 +1,5 @@
+const { printFlavorMods } = require("../helpers/printFlavorMods");
+
 module.exports = function formatOrderPrint(printer, order) {
   printer.clear();
 
@@ -46,20 +48,7 @@ module.exports = function formatOrderPrint(printer, order) {
       printer.println(`1/2 ${item.flavor2?.name}`);
       printer.bold(false);
       printer.setTextNormal();
-
-      printer.newLine();
-
-      if (item.flavor2?.extras?.length > 0) {
-        item.flavor2.extras.forEach((ex) => printer.println(`      + ${ex}`));
-        printer.newLine();
-      }
-
-      if (item.flavor2?.removed?.length > 0) {
-        item.flavor2.removed.forEach((rm) =>
-          printer.println(`      - SEM ${rm}`),
-        );
-        printer.newLine();
-      }
+      printFlavorMods(printer, item.flavor2, "      ");
 
       // Metade 1
       printer.setTextSize(1, 0);
@@ -67,17 +56,7 @@ module.exports = function formatOrderPrint(printer, order) {
       printer.println(`1/2 ${item.flavor1?.name}`);
       printer.bold(false);
       printer.setTextNormal();
-
-      if (item.flavor1?.extras?.length > 0) {
-        item.flavor1.extras.forEach((ex) => printer.println(`      + ${ex}`));
-        printer.newLine();
-      }
-      if (item.flavor1?.removed?.length > 0) {
-        item.flavor1.removed.forEach((rm) =>
-          printer.println(`      - SEM ${rm}`),
-        );
-        printer.newLine();
-      }
+      printFlavorMods(printer, item.flavor1, "      ");
     } else {
       // --- LÓGICA PARA ITEM SIMPLES ---
       printer.setTextSize(1, 0);
@@ -90,12 +69,12 @@ module.exports = function formatOrderPrint(printer, order) {
       const simpleRemoved =
         item.flavor1?.removed || item.removedIngredients || [];
 
-      if (simpleExtras.length > 0) {
-        simpleExtras.forEach((extra) => printer.println(`   + ${extra}`));
-      }
-      if (simpleRemoved.length > 0) {
-        simpleRemoved.forEach((rm) => printer.println(`   - SEM ${rm}`));
-      }
+      // item simples
+      printFlavorMods(
+        printer,
+        { extras: simpleExtras, removed: simpleRemoved },
+        "   ",
+      );
     }
 
     if (item.notes) {
@@ -109,13 +88,47 @@ module.exports = function formatOrderPrint(printer, order) {
   printer.drawLine();
 
   // ===== TOTAIS E PAGAMENTO =====
+  const round2 = (n) => Math.round(n * 100) / 100;
+
   const deliveryFee = order.deliveryFee || 0;
   const total = order.total || 0;
 
+  const itemsTotal = round2(
+    order.items.reduce(
+      (sum, item) => sum + (item.price || 0) * (item.quantity || 1),
+      0,
+    ),
+  );
+
+  const extrasTotal = Math.max(0, round2(total - itemsTotal - deliveryFee));
+
+  printer.setTextSize(0, 0);
+  printer.tableCustom([
+    { text: "Preço do(s) Item(s)", align: "LEFT", width: 0.6 },
+    { text: `R$ ${itemsTotal.toFixed(2)}`, align: "RIGHT", width: 0.4 },
+  ]);
+  if (order.method === "DELIVERY") {
+    printer.tableCustom([
+      { text: "Preço de Entrega", align: "LEFT", width: 0.6 },
+      { text: `R$ ${deliveryFee.toFixed(2)}`, align: "RIGHT", width: 0.4 },
+    ]);
+  }
+  if (extrasTotal > 0) {
+    printer.tableCustom([
+      { text: "Ingredientes extras", align: "LEFT", width: 0.6 },
+      { text: `R$ ${extrasTotal.toFixed(2)}`, align: "RIGHT", width: 0.4 },
+    ]);
+  }
+
+  printer.drawLine();
+
+  printer.setTextSize(1, 0);
+  printer.bold(true);
   printer.tableCustom([
     { text: "TOTAL", align: "LEFT", width: 0.5 },
     { text: `R$ ${total.toFixed(2)}`, align: "RIGHT", width: 0.5 },
   ]);
+  printer.bold(false);
 
   printer.drawLine();
   const methodConsumptionMap = {
