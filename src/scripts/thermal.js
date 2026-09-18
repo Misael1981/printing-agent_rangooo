@@ -6,8 +6,7 @@ const {
 async function test() {
   const printer = new ThermalPrinter({
     type: PrinterTypes.EPSON,
-    interface: "tcp://10.0.0.250:9100", // <-- IP da sua Goldensky
-    // interface: "\\\\.\\COM1",
+    interface: "tcp://10.0.0.250:9100",
     characterSet: "PC860_PORTUGUESE",
     options: { timeout: 5000 },
     removeSpecialCharacters: false,
@@ -20,11 +19,6 @@ async function test() {
     return;
   }
 
-  // printer.println("TESTE DE ACENTOS");
-  // printer.println("Açaí, Coração, Açúcar, Pão, Maçã, Çedilha");
-  // printer.drawLine();
-  // printer.println("Impressão OK!");
-  // printer.cut();
   const testOrder = {
     id: "1010",
     customerName: "Teste Impressora",

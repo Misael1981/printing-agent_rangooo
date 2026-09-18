@@ -102,21 +102,21 @@ module.exports = function formatOrderPrint(printer, order) {
 
   const extrasTotal = Math.max(0, round2(total - itemsTotal - deliveryFee));
 
-  printer.setTextSize(0, 0);
+  printer.setTextNormal();
   printer.tableCustom([
-    { text: "Preço do(s) Item(s)", align: "LEFT", width: 0.6 },
-    { text: `R$ ${itemsTotal.toFixed(2)}`, align: "RIGHT", width: 0.4 },
+    { text: "Produtos", align: "LEFT", width: 0.5 },
+    { text: `R$ ${itemsTotal.toFixed(2)}`, align: "RIGHT", width: 0.5 },
   ]);
   if (order.method === "DELIVERY") {
     printer.tableCustom([
-      { text: "Preço de Entrega", align: "LEFT", width: 0.6 },
-      { text: `R$ ${deliveryFee.toFixed(2)}`, align: "RIGHT", width: 0.4 },
+      { text: "Entrega", align: "LEFT", width: 0.5 },
+      { text: `R$ ${deliveryFee.toFixed(2)}`, align: "RIGHT", width: 0.5 },
     ]);
   }
   if (extrasTotal > 0) {
     printer.tableCustom([
-      { text: "Ingredientes extras", align: "LEFT", width: 0.6 },
-      { text: `R$ ${extrasTotal.toFixed(2)}`, align: "RIGHT", width: 0.4 },
+      { text: "Ingredientes extras", align: "LEFT", width: 0.5 },
+      { text: `R$ ${extrasTotal.toFixed(2)}`, align: "RIGHT", width: 0.5 },
     ]);
   }
 

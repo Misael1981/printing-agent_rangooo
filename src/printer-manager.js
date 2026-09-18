@@ -10,6 +10,9 @@ const scanNetwork = require("./services/networkScanner.js");
 const Store = require("electron-store");
 const { app } = require("electron");
 const appStore = new Store();
+const {
+  wrapPrinterWithAsciiFallback,
+} = require("./helpers/asciiFallbackPrinter.js");
 
 // Configurar logs - usar userData do Electron
 const logDir = app
@@ -234,10 +237,20 @@ class PrinterManager {
     if (typeof order.deliveryFee !== "number") order.deliveryFee = 0;
     if (typeof order.total !== "number") order.total = 0;
 
-    try {
-      formatOrderPrint(this.printer, order);
+    const RESTAURANTS_NEEDING_ASCII_FALLBACK = ["Pizzaria Jk"];
 
-      await this.printer.execute();
+    try {
+      const needsFallback = RESTAURANTS_NEEDING_ASCII_FALLBACK.includes(
+        order.restaurantName,
+      );
+      const safePrinter = wrapPrinterWithAsciiFallback(
+        this.printer,
+        needsFallback,
+      );
+
+      formatOrderPrint(safePrinter, order);
+
+      await this.printer.execute(); // ← continua sendo this.printer, não safePrinter
 
       const ack = {
         success: true,
